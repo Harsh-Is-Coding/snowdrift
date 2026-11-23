@@ -1,0 +1,617 @@
+<title>Snowdrift Study Break</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#e9f1f7; --bg2:#d6e5f0; --surface:#ffffff; --ink:#132638; --muted:#52677b; --line:#d0dde8;
+  --ice:#2b78ad; --ice-soft:#dbeaf5; --bank:#ffffff; --bank-edge:#c9dcea; --flakes:#ffffff;
+  --t0:#8a96a3; --t1:#c08a12; --t2:#1f8a6a; --t3:#2b78ad; --t4:#7a4fd1; --t5:#c2337a;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1622; --bg2:#13263a; --surface:#14273a; --ink:#e7eff6; --muted:#9bb0c4; --line:#233a50;
+  --ice:#82c4ef; --ice-soft:#1b3550; --bank:#2a4560; --bank-edge:#3b5b7a; --flakes:#cfe3f3;
+  --t0:#97a6b5; --t1:#f0b84a; --t2:#5fd1a8; --t3:#82c4ef; --t4:#b89cff; --t5:#ff7fb8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1622; --bg2:#13263a; --surface:#14273a; --ink:#e7eff6; --muted:#9bb0c4; --line:#233a50;
+  --ice:#82c4ef; --ice-soft:#1b3550; --bank:#2a4560; --bank-edge:#3b5b7a; --flakes:#cfe3f3;
+  --t0:#97a6b5; --t1:#f0b84a; --t2:#5fd1a8; --t3:#82c4ef; --t4:#b89cff; --t5:#ff7fb8; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg2),var(--bg) 55%);background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 120px;position:relative}
+#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+#bank{position:fixed;left:-10%;right:-10%;bottom:0;height:28px;background:var(--bank);border-top:2px solid var(--bank-edge);
+  border-radius:50% 50% 0 0 / 40px 40px 0 0;z-index:0;transition:height 1.2s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
+h1{font-size:clamp(2.2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1rem;font-weight:700}
+p{margin:0}
+.eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px 24px}
+header .lede{max-width:52ch;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted)}
+.stats b{color:var(--ink);font-family:var(--mono);font-weight:500}
+
+.stage{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;gap:18px;min-width:0}
+.panel{display:grid;gap:18px;min-width:0}
+
+.gauge{order:-1;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:4px 14px}
+.gauge .read{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.gauge .read small{font-size:.8rem;font-weight:500;color:var(--muted)}
+.gauge .read{grid-row:span 2}
+.gauge .zone{font-size:.85rem;color:var(--muted)}
+.stake{display:none}
+.stake .pole{position:absolute;left:18px;top:0;bottom:0;width:10px;border-radius:5px;background:repeating-linear-gradient(180deg,var(--t5) 0 20px,var(--surface) 20px 40px);border:1px solid var(--line)}
+.stake .fill{position:absolute;left:8px;width:30px;bottom:0;height:0;background:var(--bank);border:2px solid var(--bank-edge);border-radius:14px 14px 4px 4px;transition:height 1.2s cubic-bezier(.2,.8,.2,1)}
+.stake .tick{position:absolute;left:34px;right:0;font-size:.66rem;line-height:1;color:var(--muted);transform:translateY(50%);white-space:nowrap}
+.stake .tick::before{content:"";display:inline-block;width:6px;height:1px;background:var(--muted);vertical-align:middle;margin-right:4px}
+.stake .tick.hit{color:var(--ink);font-weight:700}
+.hbar{display:block;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.hbar i{display:block;height:100%;width:0;background:var(--ice);transition:width 1.2s}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:22px;align-items:center}
+@media (max-width:560px){.hero{grid-template-columns:minmax(0,1fr)}.hero canvas{justify-self:center}}
+canvas.flake{width:200px;height:200px;max-width:100%}
+.tierlist{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.tierlist li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:baseline;font-size:.93rem}
+.tierlist .dot{width:12px;height:12px;border-radius:3px;align-self:center}
+.tierlist .pts{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.tierlist em{font-style:normal;color:var(--muted)}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.mode{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;display:grid;gap:2px;background:transparent;color:inherit;text-align:left;font:inherit}
+.mode[aria-pressed="true"]{border-color:var(--ice);background:var(--ice-soft)}
+.mode strong{font-family:var(--display);font-size:1rem}
+.mode span{font-size:.85rem;color:var(--muted)}
+.modes-label{font-size:.85rem;font-weight:700}
+
+button{font:inherit;cursor:pointer}
+.btn{background:var(--ice);color:var(--surface);border:0;border-radius:999px;padding:12px 24px;font-weight:700;font-family:var(--display);font-size:1.02rem}
+.btn.ghost{background:transparent;color:var(--ice);border:1.5px solid var(--ice)}
+.btn.small{padding:7px 15px;font-size:.88rem}
+.btn.tiny{padding:4px 11px;font-size:.8rem}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--ice);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.note{font-size:.85rem;color:var(--muted)}
+
+.playtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pips{display:flex;gap:6px;flex-wrap:wrap}
+.pips i{width:26px;height:8px;border-radius:4px;background:var(--line)}
+.pips i.now{background:var(--ink)}
+.clock{font-family:var(--mono);font-size:1.05rem;min-width:3ch;text-align:right}
+.clock.low{color:var(--t5)}
+.prompt{text-align:center;font-family:var(--display);font-size:clamp(1.6rem,5.4vw,2.4rem);font-weight:800;line-height:1.15;letter-spacing:-.01em;text-wrap:balance}
+.hint{color:var(--muted);font-size:.93rem}
+#play>.eyebrow,#promptHint{text-align:center}
+.field{display:flex;gap:8px}
+.field input{flex:1;min-width:0;font:inherit;font-size:1.2rem;padding:14px 18px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.field input:focus{border-color:var(--ice);outline:none}
+.field input.bad{border-color:var(--t5)}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.field input.shake{animation:shake .25s}
+.err{color:var(--t5);font-size:.9rem;min-height:1.3em}
+.err.care{color:var(--ink);background:var(--ice-soft);border-radius:12px;padding:10px 12px}
+.timer{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.timer i{display:block;height:100%;background:var(--ice);width:100%;transition:width .25s linear}
+.tries{font-size:.85rem;color:var(--muted)}
+
+.reveal{border-radius:16px;padding:20px;display:grid;gap:6px;justify-items:start;border:2px solid var(--tc);background:var(--bg)}
+.reveal .tname{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,5vw,2.2rem);color:var(--tc);line-height:1}
+.reveal .tpts{font-family:var(--mono);font-size:1rem;color:var(--tc)}
+.reveal .said{font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
+@keyframes pop{from{transform:scale(.92);opacity:.4}to{transform:none;opacity:1}}
+.reveal.anim{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+
+.endtop{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:22px;align-items:center}
+@media (max-width:560px){.endtop{grid-template-columns:minmax(0,1fr)}.endtop canvas{justify-self:center}}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,3.8rem);line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.big small{font-size:1.1rem;font-weight:500;color:var(--muted);letter-spacing:0}
+.zonebig{font-family:var(--display);font-weight:700;font-size:1.15rem}
+.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;padding:11px 0;border-bottom:1px solid var(--line)}
+.res:last-child{border-bottom:0}
+.res .q{font-size:.82rem;color:var(--muted)}
+.res .a{font-weight:700;overflow-wrap:anywhere}
+.res .t{text-align:right;align-self:center;display:grid;justify-items:end}
+.res .t b{font-family:var(--display);font-size:.9rem}
+.res .t span{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.res details{grid-column:1 / -1;margin-top:4px}
+.res summary{font-size:.85rem;color:var(--ice);cursor:pointer;width:max-content}
+.lst{display:grid;gap:8px;margin-top:8px}
+.lst .tl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:.88rem}
+@media (max-width:480px){.lst .tl{grid-template-columns:minmax(0,1fr)}}
+.lst .tl b{font-family:var(--display)}
+.lst .tl span{color:var(--muted)}
+.sharebox{font-family:var(--mono);font-size:.9rem;white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow-wrap:anywhere}
+
+.quotes{display:grid;gap:14px}
+.quote{display:grid;gap:6px}
+.quote label{font-size:.8rem;color:var(--muted)}
+.quote textarea{width:100%;font-family:var(--display);font-size:1.08rem;font-weight:500;padding:12px 14px;border-radius:12px;border:1.5px dashed var(--ice);background:var(--bg);color:var(--ink);resize:vertical;min-height:62px}
+.quote .row{justify-content:flex-end}
+.ok{font-size:.82rem;color:var(--t2)}
+
+.wall{display:grid;gap:18px}
+.wallq{display:grid;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:4px 11px;background:var(--bg);border:1px solid var(--line);font-size:.9rem;overflow-wrap:anywhere}
+.chip.unique{border-color:var(--t5);color:var(--t5)}
+.chip sup{font-family:var(--mono);color:var(--muted);margin-left:3px;font-size:.7rem}
+.empty{color:var(--muted);font-size:.95rem;padding:14px;border:1px dashed var(--line);border-radius:12px}
+
+/* station tools */
+.staff{border-style:dashed}
+.staff table{width:100%;border-collapse:collapse;font-size:.9rem}
+.staff th,.staff td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.staff th{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.staff td.n{font-family:var(--mono);text-align:right;width:3ch}
+.staff select,.staff input[type=text],.staff textarea{font:inherit;font-size:.9rem;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.staff textarea{width:100%;min-height:90px;font-family:var(--mono);font-size:.8rem}
+.tablewrap{overflow-x:auto}
+.toggle{display:flex;gap:10px;align-items:flex-start}
+.toggle input{width:20px;height:20px;margin-top:2px}
+footer{text-align:center;font-size:.8rem;color:var(--muted)}
+footer button{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.8rem;padding:4px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<canvas id="snow" aria-hidden="true"></canvas>
+<div id="bank" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <div style="display:grid;gap:8px">
+      <span class="eyebrow">Study break · before snowflake making</span>
+      <h1>Snowdrift</h1>
+      <p class="lede">Seven prompts about unwinding, studying and McMaster. No timer. Rarer answers pile up more snow. Then turn your answers into quotes for your snowflake.</p>
+    </div>
+    <div class="stats"><span><b id="playerCount">0</b> runs at this station</span><span>Deepest today <b id="deepest">–</b></span></div>
+  </header>
+
+  <div class="stage">
+    <main class="card">
+      <section class="panel" id="start">
+        <div class="hero">
+          <div style="display:grid;gap:14px;min-width:0">
+            <h2>Six kinds of snow</h2>
+            <ul class="tierlist" id="tierList"></ul>
+          </div>
+          <canvas class="flake" id="sampleFlake" width="400" height="400" aria-label="Example snowflake with every tier"></canvas>
+        </div>
+        <div class="row"><button class="btn" id="startBtn">Start</button></div>
+        <p class="note">An answer counts if it's on our list for that prompt. There are over 20,000 ways to say things on the lists, including McMaster spots and services. Typos and different wording are fine. If your answer isn't there, try saying it another way.</p>
+      </section>
+
+      <section class="panel" id="play" hidden>
+        <div class="playtop"><div class="pips" id="pips"></div></div>
+        <span class="eyebrow" id="qNum"></span>
+        <p class="prompt" id="promptText"></p>
+        <p class="hint" id="promptHint"></p>
+        <form id="answerForm" style="display:grid;gap:10px" autocomplete="off">
+          <div class="field"><input type="text" id="answerInput" maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn" type="submit">Enter</button></div>
+          
+          <div class="err" id="err" aria-live="polite"></div>
+          <div class="row" style="justify-content:space-between"><span class="tries" id="tries"></span><button class="btn ghost small" type="button" id="skipBtn">Pass</button></div>
+        </form>
+        <div class="reveal" id="reveal" hidden>
+          <span class="said" id="rSaid"></span>
+          <span class="tname" id="rName"></span>
+          <span class="tpts" id="rPts"></span>
+          <span class="hint" id="rDetail"></span>
+          <div class="row" style="margin-top:8px"><button class="btn small" id="nextBtn">Next</button></div>
+        </div>
+      </section>
+
+      <section class="panel" id="end" hidden>
+        <div class="endtop">
+          <div style="display:grid;gap:8px;min-width:0">
+            <span class="eyebrow" id="endLabel">Your drift</span>
+            <div class="big" id="endCm">0 <small>cm</small></div>
+            <div class="zonebig" id="endZone"></div>
+            <p class="hint" id="endNote"></p>
+          </div>
+          <canvas class="flake" id="myFlake" width="400" height="400" aria-label="Your snowflake"></canvas>
+        </div>
+        <div id="results"></div>
+        <div style="display:grid;gap:8px">
+          <h3>Share your drift</h3>
+          <div class="sharebox" id="shareText"></div>
+          <div class="row"><button class="btn small" id="copyShare">Copy result</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="gauge" aria-label="Snow depth">
+      <div class="read" id="gRead">0<small> cm</small></div>
+      <div class="zone" id="gZone">Bare ground</div>
+      <div class="hbar"><i id="hFill"></i></div>
+      <div class="stake" id="stake"><div class="fill" id="sFill"></div><div class="pole"></div></div>
+    </aside>
+  </div>
+
+  <section class="card" id="quotesCard" hidden>
+    <div style="display:grid;gap:6px">
+      <h2>Quotes for your snowflake</h2>
+      <p class="hint">Each one starts from your answer. Edit the words, then write your favourite in the centre or along the arms of your paper snowflake.</p>
+    </div>
+    <div class="quotes" id="quotes"></div>
+    <div class="row"><button class="btn ghost small" id="shuffleBtn">Try different wording</button><button class="btn small" id="againBtn">Next player</button></div>
+  </section>
+
+  <section class="card">
+    <div style="display:grid;gap:6px">
+      <h2>What people said at this station</h2>
+      <p class="hint">Answers from earlier runs on this device, for inspiration while you make your snowflake. Pink answers came from just one person.</p>
+    </div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <section class="card staff" id="staff" hidden>
+    <div style="display:grid;gap:6px">
+      <h2>Station tools</h2>
+      <p class="hint">For volunteers. Everything here is saved on this device only.</p>
+    </div>
+    <label class="toggle"><input type="checkbox" id="lenient"><span><b>Lenient mode.</b> Answers that aren't on the list still score Powder (30 cm) instead of being rejected. Gibberish and rude words are still blocked.</span></label>
+    <div style="display:grid;gap:8px">
+      <h3>Answers that weren't on the list</h3>
+      <p class="hint">Add good ones to a tier so they count from now on.</p>
+      <div class="tablewrap" id="missed"></div>
+    </div>
+    <div style="display:grid;gap:8px">
+      <h3>Add an answer</h3>
+      <div class="row"><select id="addPrompt" aria-label="Prompt"></select><input type="text" id="addText" placeholder="Answer, or several separated by |" aria-label="Answer"><select id="addTier" aria-label="Tier"></select><button class="btn small" id="addBtn">Add</button></div>
+      <span class="ok" id="addMsg" aria-live="polite"></span>
+    </div>
+    <div style="display:grid;gap:8px">
+      <h3>Answers you added</h3>
+      <div class="tablewrap" id="custom"></div>
+    </div>
+    <div style="display:grid;gap:8px">
+      <h3>Move to another device</h3>
+      <p class="hint">Copy this text and paste it into Station tools on the other device, then press Import.</p>
+      <textarea id="xfer" aria-label="Station data"></textarea>
+      <div class="row"><button class="btn ghost small" id="exportBtn">Show my data</button><button class="btn ghost small" id="importBtn">Import</button><button class="btn ghost small" id="clearWall">Clear the answer wall</button><span class="ok" id="xferMsg" aria-live="polite"></span></div>
+    </div>
+  </section>
+  <footer><button id="staffLink">Station tools</button></footer>
+</div>
+
+<script src="match.js"></script>
+<script src="answers.js"></script>
+<script src="answers2.js"></script>
+<script>
+// ---------- content ----------
+const TIERS = [
+  {name:"Flurry",            pts:10,  c:"--t0", sq:"⬜", desc:"The answer almost everyone thinks of first."},
+  {name:"Snow Joke",         pts:15,  c:"--t1", sq:"🟨", desc:"Feels clever, but it's a classic."},
+  {name:"Powder",            pts:30,  c:"--t2", sq:"🟩", desc:"A solid answer, a step past the obvious."},
+  {name:"Hoarfrost",         pts:60,  c:"--t3", sq:"🟦", desc:"Less common. Nice thinking."},
+  {name:"Deep Freeze",       pts:85,  c:"--t4", sq:"🟪", desc:"Rare. Few people go there."},
+  {name:"One in a Snowstorm",pts:100, c:"--t5", sq:"❄️", desc:"A deep cut almost nobody finds."}
+];
+const ZONES = [[0,"Bare ground"],[10,"A dusting"],[40,"Ankle deep"],[90,"Knee deep"],[150,"Snow day, classes cancelled"],[220,"Snowman height"],[320,"Up to the windowsills"],[450,"Buried the bus stop"],[580,"Rooftops"],[700,"Record snowfall"]];
+const MAX = 700;
+const ALL = globalThis.SNOW_PROMPTS;
+const BYID = Object.fromEntries(ALL.map(p=>[p.id,p]));
+const DRIFT = ["m1","m2","m4","m5","c1","m6","m7"].map(id=>BYID[id]);
+const M = globalThis.SnowMatch;
+
+// ---------- storage (this device only) ----------
+const KEY = {wall:"snowdrift.wall.v3", custom:"snowdrift.custom.v1", missed:"snowdrift.missed.v1", lenient:"snowdrift.lenient.v1"};
+function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
+function store(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+let wall = load(KEY.wall, {runs:0, best:{}, answers:{}});
+let custom = load(KEY.custom, {});
+let missed = load(KEY.missed, {});
+let lenient = !!load(KEY.lenient, false);
+
+// ---------- answer lists ----------
+const INDEX = {};
+function rebuild(id){
+  const p = BYID[id], es = M.parsePrompt(p);
+  (custom[id]||[]).forEach(c => es.push({text:c.t.split("|")[0].trim(), aliases:c.t.split("|").slice(1).map(s=>s.trim()).filter(Boolean), tier:c.tier, custom:true}));
+  p.entries = es; INDEX[id] = M.buildIndex(es);
+}
+ALL.forEach(p => rebuild(p.id));
+
+// ---------- helpers ----------
+const $ = id => document.getElementById(id);
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function zoneFor(cm){ let z = ZONES[0][1]; for(const [d,n] of ZONES) if(cm>=d) z=n; return z; }
+function today(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+// ---------- input checks ----------
+const CARE = /\b(kill (my ?self|me)|kms|suicid\w*|want(ing)? to die|wanna die|end (it all|my life)|self ?harm|hurt(ing)? my ?self|unalive|don'?t want to (live|be here))\b/i;
+const RUDE = /\b(f+u+c+k\w*|fck\w*|sh[i1]t\w*|b[i1]tch\w*|cunt\w*|d[i1]ck\w*|cock\w*|puss(y|ies)|slut\w*|wh[o0]re\w*|fag\w*|n[i1]gg\w*|retard\w*|rap(e|ist|ing)|porn\w*|sex(y|ual)?|nazi\w*|hitler|tits?|boobs?|penis|vagina|cum|horny|nude\w*|asshole|dumbass|bastard|wank\w*|twat|kys)\b/i;
+function precheck(p, v){
+  const t = v.trim();
+  if(CARE.test(t)) return {care:true, msg:"Thanks for being honest. You don't have to carry that alone. You can call or text 9-8-8 any time, call Good2Talk at 1-866-925-5454, or visit the Student Wellness Centre on campus. A volunteer at this station can help you find support too."};
+  if(t.length<2) return {msg:"Type at least two letters."};
+  if(!/[a-z]/i.test(t)) return {msg:"Use words, not just numbers or symbols."};
+  if(/(.)\1{3,}/i.test(t.replace(/\s/g,"")) && !/^[a-z]+$/i.test(t.replace(/(.)\1+/gi,"$1"))) return {msg:"That doesn't look like a real answer."};
+  if(/^[^aeiouy\s]{5,}$/i.test(t) || /(qwer|asdf|zxcv|hjkl|uiop|jkl;)/i.test(t)) return {msg:"That doesn't look like a real answer."};
+  if(RUDE.test(t)) return {msg:"Keep it friendly. Try another answer."};
+  if(p.one && /\s/.test(t)) return {msg:"One word only for this prompt."};
+  return null;
+}
+
+// ---------- falling snow + bank + gauge ----------
+const snowC = $("snow"), sctx = snowC.getContext("2d");
+let flakes = [], reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function sizeSnow(){ const r = devicePixelRatio||1; snowC.width = innerWidth*r; snowC.height = innerHeight*r; sctx.setTransform(r,0,0,r,0,0);
+  const n = Math.round(Math.min(110, innerWidth/12)); flakes = Array.from({length:n},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:1+Math.random()*2.6,s:.3+Math.random()*.9,w:Math.random()*6.28})); }
+let flakeCol = "#fff", intensity = 1;
+function snowFrame(){
+  sctx.clearRect(0,0,innerWidth,innerHeight); sctx.fillStyle = flakeCol; sctx.globalAlpha = .8;
+  for(const f of flakes){ f.y += f.s*intensity; f.w += .01; f.x += Math.sin(f.w)*.35;
+    if(f.y>innerHeight+4){ f.y=-4; f.x=Math.random()*innerWidth; }
+    sctx.beginPath(); sctx.arc(f.x,f.y,f.r,0,6.283); sctx.fill(); }
+  if(!reduce) requestAnimationFrame(snowFrame);
+}
+function setDepth(cm){
+  const frac = Math.min(cm/MAX,1);
+  $("bank").style.height = (28 + frac*Math.min(innerHeight*0.32, 260))+"px";
+  $("sFill").style.height = (frac*100)+"%"; $("hFill").style.width = (frac*100)+"%";
+  $("gRead").innerHTML = `${cm}<small> cm</small>`; $("gZone").textContent = zoneFor(cm);
+  document.querySelectorAll(".stake .tick").forEach(t => t.classList.toggle("hit", cm >= +t.dataset.d));
+  intensity = 1 + frac*1.6;
+}
+function buildStake(){
+  const s = $("stake");
+  ZONES.slice(1).forEach(([d,n])=>{ const t=document.createElement("div"); t.className="tick"; t.dataset.d=d; t.style.bottom=(d/MAX*100)+"%"; t.textContent=d; t.title=n; s.append(t); });
+}
+
+// ---------- snowflake ----------
+function drawFlake(canvas, idxs){
+  const ctx = canvas.getContext("2d"), W = canvas.width, c = W/2, R = W*0.45;
+  ctx.clearRect(0,0,W,W); ctx.lineCap="round"; ctx.lineJoin="round";
+  const list = idxs.filter(i=>i!==null && i!==undefined), n = list.length;
+  const arm = R*(0.3+0.7*Math.min(n,7)/7);
+  for(let k=0;k<6;k++){
+    ctx.save(); ctx.translate(c,c); ctx.rotate(k*Math.PI/3);
+    ctx.strokeStyle = cssVar("--ice"); ctx.globalAlpha=.55; ctx.lineWidth = W*.012;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-arm); ctx.stroke(); ctx.globalAlpha=1;
+    list.slice(0,9).forEach((ti,s)=>{
+      const lvl = ti+1, y = -arm*((s+1)/(Math.min(n,9)+1)), len = R*(.06+.035*lvl)*(1-.4*(s+1)/(Math.min(n,9)+1));
+      ctx.strokeStyle = cssVar(TIERS[ti].c); ctx.lineWidth = W*(.006+.0018*lvl);
+      for(const sd of [-1,1]){
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(sd*len*.87,y-len*.5); ctx.stroke();
+        if(lvl>=3){ ctx.beginPath(); ctx.moveTo(sd*len*.5,y-len*.29); ctx.lineTo(sd*len*.5,y-len*.68); ctx.stroke(); }
+        if(lvl>=5){ ctx.beginPath(); ctx.moveTo(sd*len*.5,y-len*.29); ctx.lineTo(sd*len*.85,y-len*.05); ctx.stroke(); }
+      }
+      if(lvl===6){ ctx.fillStyle = cssVar(TIERS[ti].c); ctx.beginPath(); for(let h=0;h<6;h++){const a=h*Math.PI/3; ctx.lineTo(Math.cos(a)*W*.018,y+Math.sin(a)*W*.018);} ctx.closePath(); ctx.fill(); }
+    });
+    ctx.restore();
+  }
+  ctx.fillStyle = cssVar("--ice"); ctx.beginPath(); for(let h=0;h<6;h++){const a=h*Math.PI/3+Math.PI/6; ctx.lineTo(c+Math.cos(a)*W*.035,c+Math.sin(a)*W*.035);} ctx.closePath(); ctx.fill();
+}
+
+// ---------- game ----------
+const run = {items:[], i:0, cm:0, locked:false};
+function show(w){ for(const id of ["start","play","end"]) $(id).hidden = id!==w; $("quotesCard").hidden = w!=="end"; }
+
+function shuffled(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+$("startBtn").onclick = ()=>{
+  run.i = 0; run.cm = 0; setDepth(0);
+  run.items = DRIFT.map(p=>({p}));
+  show("play"); renderPrompt();
+};
+
+function renderPrompt(){
+  const it = run.items[run.i], p = it.p;
+  const pips = $("pips"); pips.innerHTML = "";
+  run.items.forEach((x,k)=>{ const i=document.createElement("i"); if(k===run.i) i.className="now"; else if(x.r) i.style.background=cssVar(x.r.tier.c); else if(k<run.i) i.style.background=cssVar("--muted"); pips.append(i); });
+  $("qNum").textContent = `Prompt ${run.i+1} of 7`;
+  $("promptText").textContent = p.q; $("promptHint").textContent = p.h;
+  $("answerForm").hidden = false; $("reveal").hidden = true; setErr(""); $("tries").textContent=""; run.locked=false; it.tried = [];
+  const inp = $("answerInput"); inp.value=""; inp.classList.remove("bad"); inp.focus({preventScroll:true});
+}
+function setErr(msg, care){ const e=$("err"); e.textContent = msg; e.classList.toggle("care", !!care); }
+function judge(p, v){
+  const r = M.find(INDEX[p.id], v);
+  if(r) return {entry:r.entry, how:r.how};
+  if(lenient) return {entry:{text:v.trim(), tier:2, lenient:true}, how:"lenient"};
+  return null;
+}
+function logMiss(p, v){
+  const k = M.tokens(v).join(" "); if(!k) return;
+  const m = missed[p.id] || (missed[p.id] = {});
+  if(!m[k]) m[k] = {t:v.trim().toLowerCase().slice(0,60), n:0};
+  m[k].n++; store(KEY.missed, missed);
+}
+$("answerForm").addEventListener("submit", e=>{
+  e.preventDefault(); if(run.locked) return;
+  const it = run.items[run.i], p = it.p, inp = $("answerInput"), v = inp.value;
+  const bad = precheck(p, v);
+  if(bad){ setErr(bad.msg, bad.care); if(!bad.care) nudge(); return; }
+  const m = judge(p, v);
+  if(m){ if(m.how==="lenient") logMiss(p, v); commit(v, m); return; }
+  logMiss(p, v); it.tried.push(v.trim());
+  setErr(it.tried.length===1 ? "That one's not on our list. Try saying it another way, or try a different answer." : "Still not on the list. Keep trying, or press Pass.");
+  $("tries").textContent = "Tried: " + it.tried.slice(-4).join(", ");
+  inp.select(); nudge();
+});
+function nudge(){ const inp=$("answerInput"); inp.classList.add("bad"); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); inp.focus(); }
+$("answerInput").addEventListener("input", ()=>{ $("answerInput").classList.remove("bad"); if(!$("err").classList.contains("care")) setErr(""); });
+$("skipBtn").onclick = ()=>{ if(!run.locked) commit("", null); };
+
+function commit(raw, m){
+  run.locked = true;
+  const it = run.items[run.i], a = raw.trim().slice(0,60);
+  it.a = m ? a : ""; it.m = m;
+  it.r = m ? {tier:TIERS[m.entry.tier], idx:m.entry.tier} : null;
+  if(it.r) run.cm += it.r.tier.pts;
+  setDepth(run.cm);
+  $("answerForm").hidden = true; const rv = $("reveal"); rv.hidden = false;
+  rv.classList.remove("anim"); void rv.offsetWidth; rv.classList.add("anim");
+  if(it.r){
+    rv.style.setProperty("--tc", cssVar(it.r.tier.c));
+    $("rSaid").textContent = `“${a}”`; $("rName").textContent = it.r.tier.name;
+    $("rPts").textContent = `+${it.r.tier.pts} cm`;
+    const same = M.tokens(a).join(" ") === M.tokens(m.entry.text).join(" ");
+    $("rDetail").textContent = m.how==="lenient" ? "Not on our list yet, so it counts as Powder." : it.r.tier.desc + (same ? "" : ` Counted as “${m.entry.text}”.`);
+  } else {
+    rv.style.setProperty("--tc", cssVar("--muted"));
+    $("rSaid").textContent = "Passed";
+    $("rName").textContent = "No snow"; $("rPts").textContent = "+0 cm";
+    const ex = examples(it.p, 3).map(x=>`“${x}”`).join(", ");
+    $("rDetail").textContent = "That's fine. Skipping is part of a calm break." + (ex ? ` Some answers on the list: ${ex}.` : "");
+  }
+  $("nextBtn").textContent = run.i===6 ? "See my drift" : "Next prompt"; renderPips();
+  $("nextBtn").focus({preventScroll:true});
+}
+function examples(p, n){ const pick = shuffled(p.entries.filter(e=>e.tier>=2 && !e.custom)); return pick.slice(0,n).map(e=>e.text); }
+function renderPips(){ [...$("pips").children].forEach((el,k)=>{ const x=run.items[k]; el.className = ""; el.style.background = x.r ? cssVar(x.r.tier.c) : (k<=run.i ? cssVar("--muted") : ""); }); }
+$("nextBtn").onclick = ()=>{
+  if(run.i<6){ run.i++; renderPrompt(); } else finish();
+};
+
+let wording = 0;
+function finish(){
+  show("end");
+  const answered = run.items.filter(x=>x.a!==undefined);
+  $("endLabel").textContent = "Your drift";
+  $("endCm").innerHTML = `${run.cm} <small>cm of 700</small>`;
+  $("endZone").textContent = zoneFor(run.cm);
+  const top = answered.filter(x=>x.r&&x.r.idx===5).length;
+  $("endNote").textContent = top ? `${top} ${top===1?"answer was":"answers were"} One in a Snowstorm.` : "Every answer still grew your snowflake. Open a prompt below to see what else was on the list.";
+  const res = $("results"); res.innerHTML = "";
+  answered.forEach(x=>{
+    const row=document.createElement("div"); row.className="res";
+    const l=document.createElement("div"); const q=document.createElement("div"); q.className="q"; q.textContent=x.p.q;
+    const a=document.createElement("div"); a.className="a"; a.textContent = x.a || "Passed"; if(!x.a) a.style.color=cssVar("--muted"); l.append(q,a);
+    const t=document.createElement("div"); t.className="t"; const b=document.createElement("b"); const s=document.createElement("span");
+    if(x.r){ b.textContent=x.r.tier.name; b.style.color=cssVar(x.r.tier.c); s.textContent=`+${x.r.tier.pts}`; } else { b.textContent="No snow"; b.style.color=cssVar("--muted"); s.textContent="+0"; }
+    t.append(b,s);
+    const d=document.createElement("details"); const sm=document.createElement("summary"); sm.textContent="See answers on the list"; d.append(sm);
+    d.addEventListener("toggle", ()=>{ if(d.open && !d.dataset.done){ d.dataset.done=1; d.append(listView(x.p)); } });
+    row.append(l,t,d); res.append(row);
+  });
+  const squares = answered.map(x=>x.r?x.r.tier.sq:"⬛").join("");
+  $("shareText").textContent = `Snowdrift ${today()}\n${squares}\n${run.cm} cm · ${zoneFor(run.cm)}`;
+  drawFlake($("myFlake"), answered.map(x=>x.r?x.r.idx:null));
+  wording = 0; renderQuotes();
+  saveRun(answered);
+  window.scrollTo({top:0,behavior:reduce?"auto":"smooth"});
+}
+function listView(p){
+  const box=document.createElement("div"); box.className="lst";
+  for(let t=5;t>=0;t--){
+    const es = shuffled(p.entries.filter(e=>e.tier===t)).slice(0,10); if(!es.length) continue;
+    const r=document.createElement("div"); r.className="tl";
+    const b=document.createElement("b"); b.textContent=TIERS[t].name; b.style.color=cssVar(TIERS[t].c);
+    const s=document.createElement("span"); s.textContent = es.map(e=>e.text).join(", ") + (p.entries.filter(e=>e.tier===t).length>10 ? ", and more" : "");
+    r.append(b,s); box.append(r);
+  }
+  return box;
+}
+$("copyShare").onclick = ()=>{
+  const txt = $("shareText").textContent;
+  navigator.clipboard.writeText(txt).then(()=>{ $("shareMsg").textContent="Copied"; setTimeout(()=>$("shareMsg").textContent="",1600); })
+    .catch(()=>{ const r=document.createRange(); r.selectNodeContents($("shareText")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $("shareMsg").textContent="Selected. Press Ctrl+C to copy."; });
+};
+function renderQuotes(){
+  const box=$("quotes"); box.innerHTML=""; let any=false;
+  run.items.forEach((x,k)=>{
+    if(!x.a) return; any=true;
+    const tpl = x.p.t[(wording+k)%x.p.t.length], id="quote"+k;
+    const w=document.createElement("div"); w.className="quote";
+    const lab=document.createElement("label"); lab.htmlFor=id; lab.textContent=`From “${x.a}”`;
+    const ta=document.createElement("textarea"); ta.id=id; ta.rows=2; ta.value=cap(tpl.replace("{a}",x.a));
+    const row=document.createElement("div"); row.className="row";
+    const msg=document.createElement("span"); msg.className="ok"; msg.setAttribute("aria-live","polite");
+    const b=document.createElement("button"); b.type="button"; b.className="btn ghost small"; b.textContent="Copy";
+    b.onclick=()=>navigator.clipboard.writeText(ta.value).then(()=>{msg.textContent="Copied";setTimeout(()=>msg.textContent="",1600);}).catch(()=>{ta.focus();ta.select();msg.textContent="Selected. Press Ctrl+C to copy.";});
+    row.append(msg,b); w.append(lab,ta,row); box.append(w);
+  });
+  if(!any) box.innerHTML = `<p class="empty">You passed every prompt, so there's nothing to build from yet. Borrow an answer from the list below, or play again.</p>`;
+}
+$("shuffleBtn").onclick = ()=>{ wording++; renderQuotes(); };
+$("againBtn").onclick = ()=>{ setDepth(0); show("start"); window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); };
+
+// ---------- station wall ----------
+function saveRun(answered){
+  wall.runs = (wall.runs||0) + 1;
+  const t = today(); if((!wall.best || wall.best.date!==t || run.cm > wall.best.cm)) wall.best = {date:t, cm: Math.max(run.cm, wall.best && wall.best.date===t ? wall.best.cm : 0)};
+  answered.forEach(x=>{ if(!x.a || !x.m) return; const label = x.m.how==="lenient" ? x.a.toLowerCase() : x.m.entry.text; const g = wall.answers[x.p.id] || (wall.answers[x.p.id] = {}); g[label] = (g[label]||0) + 1; });
+  store(KEY.wall, wall); renderWall();
+}
+function renderWall(){
+  $("playerCount").textContent = wall.runs||0;
+  $("deepest").textContent = wall.best && wall.best.date===today() ? wall.best.cm+" cm" : "–";
+  const box=$("wall"); box.innerHTML="";
+  const blocks = DRIFT.map(p=>({p, g:wall.answers[p.id]||{}})).filter(b=>Object.keys(b.g).length);
+  if(!blocks.length){ box.innerHTML = `<p class="empty">Answers show up here as people finish a run on this device.</p>`; return; }
+  blocks.forEach(({p,g})=>{
+    const sec=document.createElement("div"); sec.className="wallq";
+    const h=document.createElement("h3"); h.textContent=p.q;
+    const chips=document.createElement("div"); chips.className="chips";
+    Object.entries(g).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,40).forEach(([label,count])=>{
+      const c=document.createElement("span"); c.className="chip"+(count===1?" unique":""); c.textContent=label;
+      if(count>1){ const s=document.createElement("sup"); s.textContent="×"+count; c.append(s); }
+      chips.append(c);
+    });
+    sec.append(h,chips); box.append(sec);
+  });
+}
+
+// ---------- station tools ----------
+function openStaff(){ $("staff").hidden = false; renderStaff(); $("staff").scrollIntoView({behavior:reduce?"auto":"smooth"}); }
+$("staffLink").onclick = openStaff;
+addEventListener("keydown", e=>{ if(e.ctrlKey && e.shiftKey && (e.key==="S"||e.key==="s")){ e.preventDefault(); openStaff(); } });
+if(location.hash==="#staff") setTimeout(openStaff, 50);
+$("lenient").onchange = e=>{ lenient = e.target.checked; store(KEY.lenient, lenient); };
+function tierSelect(sel){ return TIERS.map((t,i)=>`<option value="${i}"${i===sel?" selected":""}>${esc(t.name)} (${t.pts})</option>`).join(""); }
+function renderStaff(){
+  $("lenient").checked = lenient;
+  $("addPrompt").innerHTML = DRIFT.map(p=>`<option value="${p.id}">${esc(p.q)}</option>`).join("");
+  $("addTier").innerHTML = tierSelect(3);
+  const rows = [];
+  for(const [pid, m] of Object.entries(missed)) for(const [k, v] of Object.entries(m)) rows.push({pid, k, ...v});
+  rows.sort((a,b)=>b.n-a.n);
+  $("missed").innerHTML = rows.length ? `<table><thead><tr><th>Answer</th><th>Prompt</th><th>Times</th><th>Add as</th><th></th></tr></thead><tbody>${rows.slice(0,80).map((r,i)=>`<tr><td>${esc(r.t)}</td><td class="muted">${esc(BYID[r.pid] ? BYID[r.pid].q : r.pid)}</td><td class="n">${r.n}</td><td><select data-i="${i}" aria-label="Tier for ${esc(r.t)}">${tierSelect(3)}</select></td><td class="row" style="flex-wrap:nowrap"><button class="btn tiny" data-add="${i}">Add</button><button class="btn ghost tiny" data-dis="${i}">Dismiss</button></td></tr>`).join("")}</tbody></table>` : `<p class="empty">Nothing yet. Answers that don't match any list show up here.</p>`;
+  $("missed").querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{ const r=rows[+b.dataset.add]; const tier=+$("missed").querySelector(`select[data-i="${b.dataset.add}"]`).value; addCustom(r.pid, r.t, tier); delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
+  $("missed").querySelectorAll("[data-dis]").forEach(b=>b.onclick=()=>{ const r=rows[+b.dataset.dis]; delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
+  const cs = []; for(const [pid, list] of Object.entries(custom)) list.forEach((c,j)=>cs.push({pid, j, ...c}));
+  $("custom").innerHTML = cs.length ? `<table><thead><tr><th>Answer</th><th>Prompt</th><th>Tier</th><th></th></tr></thead><tbody>${cs.map((c,i)=>`<tr><td>${esc(c.t)}</td><td class="muted">${esc(BYID[c.pid] ? BYID[c.pid].q : c.pid)}</td><td>${esc(TIERS[c.tier].name)}</td><td><button class="btn ghost tiny" data-rm="${i}">Remove</button></td></tr>`).join("")}</tbody></table>` : `<p class="empty">None yet.</p>`;
+  $("custom").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ const c=cs[+b.dataset.rm]; custom[c.pid].splice(c.j,1); store(KEY.custom, custom); rebuild(c.pid); renderStaff(); });
+}
+function addCustom(pid, text, tier){
+  text = String(text).trim().slice(0,200); if(!text || !BYID[pid]) return false;
+  (custom[pid] || (custom[pid] = [])).push({t:text, tier}); store(KEY.custom, custom); rebuild(pid); return true;
+}
+$("addBtn").onclick = ()=>{ const ok = addCustom($("addPrompt").value, $("addText").value, +$("addTier").value); $("addMsg").textContent = ok ? "Added. It counts from now on." : "Type an answer first."; if(ok){ $("addText").value=""; renderStaff(); } setTimeout(()=>$("addMsg").textContent="",2500); };
+$("exportBtn").onclick = ()=>{ $("xfer").value = JSON.stringify({custom, missed, wall}); $("xfer").select(); $("xferMsg").textContent = "Copy the text above."; };
+$("importBtn").onclick = ()=>{
+  try{
+    const d = JSON.parse($("xfer").value);
+    if(d.custom) for(const [pid, list] of Object.entries(d.custom)) if(BYID[pid] && Array.isArray(list)) list.forEach(c=>{ if(c && typeof c.t==="string" && c.tier>=0 && c.tier<=5 && !(custom[pid]||[]).some(x=>x.t===c.t)) (custom[pid]||(custom[pid]=[])).push({t:c.t.slice(0,200), tier:c.tier|0}); });
+    store(KEY.custom, custom); ALL.forEach(p=>rebuild(p.id)); renderStaff(); $("xferMsg").textContent = "Imported the added answers.";
+  }catch(e){ $("xferMsg").textContent = "That text isn't valid station data."; }
+};
+$("clearWall").onclick = ()=>{ if($("clearWall").dataset.sure){ wall = {runs:0, best:{}, answers:{}}; store(KEY.wall, wall); renderWall(); $("clearWall").textContent="Clear the answer wall"; delete $("clearWall").dataset.sure; $("xferMsg").textContent="Wall cleared."; } else { $("clearWall").dataset.sure=1; $("clearWall").textContent="Press again to clear"; } };
+
+// ---------- boot ----------
+function themeRefresh(){
+  flakeCol = cssVar("--flakes");
+  drawFlake($("sampleFlake"), [0,1,2,3,4,5,2]);
+  if(!$("end").hidden) drawFlake($("myFlake"), run.items.filter(x=>x.a!==undefined).map(x=>x.r?x.r.idx:null));
+  if(reduce) snowFrame();
+}
+$("tierList").innerHTML = TIERS.map(t=>`<li><span class="dot" style="background:var(${t.c})"></span><span><b>${t.name}</b> <em>${t.desc}</em></span><span class="pts">${t.pts}</span></li>`).join("");
+buildStake(); sizeSnow(); themeRefresh(); setDepth(0); renderWall();
+addEventListener("resize", ()=>{ sizeSnow(); setDepth(run.cm); if(reduce) snowFrame(); });
+snowFrame();
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeRefresh); }catch(e){}
+new MutationObserver(themeRefresh).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>

@@ -1,0 +1,22 @@
+{
+  "m1": { "good": ["chamomile tea", "play with my cat", "go on a short run", "breathing exercises", "listen to a podcast", "look at the sky", "hot shower", "eat chocolate", "pace around", "tidy my desk", "hug my dog", "play a song on guitar", "box breaths", "walk around the block"],
+          "bad": ["carburetor", "tax law", "volcano", "purple", "my exam is tomorrow", "the eiffel tower", "spreadsheet", "algebra", "mitochondria", "library", "a stapler", "jupiter", "economics", "proud"] },
+  "m2": { "good": ["call my grandma", "make a sandwich", "go skating", "do some sit ups", "play fetch with my dog", "make a paper snowflake", "fold laundry"],
+          "bad": ["chemistry textbook", "a parking lot", "my midterm", "relieved", "the dmv", "insurance", "a brick"] },
+  "m3": { "good": ["third floor of thode", "a quiet cafe downtown", "my grandma's kitchen", "the train", "late evenings", "the student union", "a library carrel", "my sister's apartment", "my dining table", "an empty classroom"],
+          "bad": ["pizza", "chocolate", "blue", "running", "my dog", "taylor swift", "happy", "flashcards", "coffee", "relieved"] },
+  "m4": { "good": ["pocky", "rice crackers", "green tea", "apple slices with peanut butter", "doritos", "a latte", "dates", "cheese strings", "cheez its", "ramen", "an americano"],
+          "bad": ["library", "flashcards", "my friends", "running", "sadness", "the moon", "keyboard", "relieved", "a lamp", "pomodoro"] },
+  "m5": { "good": ["writing summaries", "studying in 25 minute blocks", "practice tests", "teaching my roommate", "using a whiteboard", "rewatching lectures", "making my own quiz", "redoing assignments", "talking it out loud"],
+          "bad": ["pizza", "the beach", "my cat", "red bull", "sunshine", "skating", "purple", "lavender", "relieved", "a toaster"] },
+  "m6": { "good": ["my little brother", "a good coffee", "cute dogs on instagram", "my best friend", "sunny days", "my nephew", "a hot meal", "a funny meme", "my mom's hugs", "pizza"],
+          "bad": ["calculus", "the dmv", "tax returns", "a spreadsheet", "printer ink", "parking tickets", "a deadline", "insurance"] },
+  "m7": { "good": ["thrilled", "rested", "unbothered", "whole", "elated", "chilled", "safe", "relaxed", "free", "unstoppable"],
+          "bad": ["pizza", "library", "chair", "banana", "car", "keyboard", "flashcards", "coffee", "skating", "spreadsheet"] },
+  "e4": { "good": ["lilacs", "fresh bread", "my dad's cologne", "peppermint", "the forest after rain", "lemon"],
+          "bad": ["calculus", "a keyboard", "flashcards", "library", "relieved", "skating"] },
+  "e7": { "good": ["making gingerbread houses", "watching christmas movies", "drinking cider", "snowshoeing", "reading under a blanket"],
+          "bad": ["tax returns", "calculus", "a stapler", "relieved", "flashcards"] },
+  "e11": { "good": ["the simpsons", "frozen", "gossip girl", "seinfeld", "kung fu panda", "breaking bad"],
+           "bad": ["calculus", "a stapler", "coffee", "relieved", "library", "flashcards"] }
+}

@@ -1,287 +1,296 @@
-<title>Snowdrift Study Break</title>
+<title>Snowdrift</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 :root{
-  --bg:#e9f1f7; --bg2:#d6e5f0; --surface:#ffffff; --ink:#132638; --muted:#52677b; --line:#d0dde8;
-  --ice:#2b78ad; --ice-soft:#dbeaf5; --bank:#ffffff; --bank-edge:#c9dcea; --flakes:#ffffff;
-  --t0:#8a96a3; --t1:#c08a12; --t2:#1f8a6a; --t3:#2b78ad; --t4:#7a4fd1; --t5:#c2337a;
-  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
-  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --snow:#F4F8FB; --glacier:#BFE3F2; --teal:#3E7C93; --navy:#0B1E2D; --aurora:#7CF2C2;
+  --frost:rgba(244,248,251,.15); --frost-line:rgba(244,248,251,.28); --veil:rgba(11,30,45,.42);
+  --font:"Nunito","Segoe UI",system-ui,sans-serif; --ice:72px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0b1622; --bg2:#13263a; --surface:#14273a; --ink:#e7eff6; --muted:#9bb0c4; --line:#233a50;
-  --ice:#82c4ef; --ice-soft:#1b3550; --bank:#2a4560; --bank-edge:#3b5b7a; --flakes:#cfe3f3;
-  --t0:#97a6b5; --t1:#f0b84a; --t2:#5fd1a8; --t3:#82c4ef; --t4:#b89cff; --t5:#ff7fb8; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0b1622; --bg2:#13263a; --surface:#14273a; --ink:#e7eff6; --muted:#9bb0c4; --line:#233a50;
-  --ice:#82c4ef; --ice-soft:#1b3550; --bank:#2a4560; --bank-edge:#3b5b7a; --flakes:#cfe3f3;
-  --t0:#97a6b5; --t1:#f0b84a; --t2:#5fd1a8; --t3:#82c4ef; --t4:#b89cff; --t5:#ff7fb8; color-scheme:dark}
-
 *{box-sizing:border-box}
-html,body{min-height:100%}
-body{margin:0;background:linear-gradient(180deg,var(--bg2),var(--bg) 55%);background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
-  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 120px;position:relative}
-#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
-#bank{position:fixed;left:-10%;right:-10%;bottom:0;height:28px;background:var(--bank);border-top:2px solid var(--bank-edge);
-  border-radius:50% 50% 0 0 / 40px 40px 0 0;z-index:0;transition:height 1.2s cubic-bezier(.2,.8,.2,1);pointer-events:none}
-.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;display:grid;gap:22px}
-h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
-h1{font-size:clamp(2.2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.025em}
-h2{font-size:1.45rem;font-weight:700}
-h3{font-size:1rem;font-weight:700}
+html,body{margin:0;min-height:100%}
+body{background:var(--navy);color:var(--snow);font:400 16px/1.5 var(--font);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--aurora);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none!important}
+
+/* ---------- world: sea cross-section ---------- */
+#sea{position:fixed;left:0;right:0;top:0;z-index:0;transition:transform 1.6s cubic-bezier(.3,.7,.2,1);will-change:transform}
+#sea .iceline{position:absolute;left:0;right:0;height:2px;background:var(--snow);opacity:.9}
+.mark{position:absolute;color:var(--snow)}
+.mark svg{display:block;fill:var(--snow);fill-opacity:.09;stroke:none}
+.mark .lbl{font-size:13px;font-weight:600;color:var(--snow);opacity:.85;margin-top:4px;white-space:nowrap}
+#specks{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+
+/* home surface scene */
+#sky{position:fixed;inset:0;z-index:2;background:linear-gradient(180deg,var(--teal) 0%,var(--teal) 30%,var(--glacier) 67%);transition:opacity .5s}
+#sky .ground{position:absolute;left:-10%;right:-10%;bottom:0;height:34%;background:var(--snow);border-radius:50% 50% 0 0 / 60px 60px 0 0}
+body[data-scene="water"] #sky{display:none}
+
+/* ---------- menu ---------- */
+#menuBtn{position:fixed;top:14px;right:14px;z-index:30;width:44px;height:44px;border-radius:50%;border:0;background:var(--veil);display:grid;place-items:center;color:var(--snow)}
+#menuBtn svg{width:22px;height:22px}
+#menu{position:fixed;top:0;right:0;bottom:0;width:min(300px,86vw);z-index:40;background:var(--navy);transform:translateX(100%);visibility:hidden;transition:transform .35s cubic-bezier(.3,.7,.2,1),visibility 0s .35s;padding:18px 18px 24px;display:grid;align-content:start;gap:6px;box-shadow:-20px 0 40px rgba(11,30,45,.5)}
+#menu.open{transform:none;visibility:visible;transition:transform .35s cubic-bezier(.3,.7,.2,1)}
+#menu .close{justify-self:end;width:44px;height:44px;border-radius:50%;border:0;background:transparent;font-size:28px;line-height:1}
+#menu .item{display:flex;gap:14px;align-items:center;padding:12px 10px;border-radius:12px;border:0;background:transparent;text-align:left;font-size:17px;font-weight:600}
+#menu .item:hover{background:var(--frost)}
+#menu .item svg{width:22px;height:22px;flex:none}
+#scrim{position:fixed;inset:0;z-index:35;background:rgba(11,30,45,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+#scrim.on{opacity:1;pointer-events:auto}
+
+/* ---------- layout ---------- */
+#app{position:relative;z-index:10;max-width:560px;margin:0 auto;padding:calc(var(--ice) + 22px) 16px 48px;min-height:100vh}
+body[data-scene="water"] #app{padding-right:84px}
+@media (min-width:860px){body[data-scene="water"] #app{padding-right:16px}}
+.frost{background:var(--veil);border:1px solid var(--frost-line);border-radius:16px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 100vmax var(--frost)}
+.btn{border:0;border-radius:999px;padding:13px 30px;font-weight:800;font-size:17px;background:var(--aurora);color:var(--navy)}
+.btn.line{background:transparent;color:var(--snow);border:2px solid var(--glacier)}
+.btn.teal{background:var(--teal);color:var(--snow)}
+.btn.sm{padding:8px 18px;font-size:15px}
+.btn:disabled{opacity:.5;cursor:default}
+.link{background:none;border:0;padding:6px 4px;text-decoration:underline;text-underline-offset:3px;font-weight:600}
+.muted{opacity:.85}
+h1,h2,h3{margin:0;font-weight:800;line-height:1.15}
 p{margin:0}
-.eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.muted{color:var(--muted)}
-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px 24px}
-header .lede{max-width:52ch;color:var(--muted)}
-.stats{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted)}
-.stats b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
-.stage{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;gap:18px;min-width:0}
-.panel{display:grid;gap:18px;min-width:0}
+/* home */
+#home{position:fixed;inset:0;z-index:11;display:grid;grid-template-rows:1fr auto;justify-items:center;padding:0 16px}
+#home .title{align-self:end;padding-bottom:9vh;text-align:center;display:grid;gap:10px}
+#home h1{font-size:clamp(44px,13vw,76px);letter-spacing:.08em;color:var(--snow);text-shadow:0 0 24px rgba(191,227,242,.9),0 0 2px rgba(191,227,242,.8)}
+#home .tag{font-size:21px;font-weight:700;color:var(--snow)}
+#home .base{height:34vh;display:grid;align-content:center;justify-items:center;gap:12px;color:var(--navy)}
+#home .base .links{display:flex;gap:18px}
+#home .base .links .link{color:var(--navy)}
+#home .base .meta{font-size:15px;color:var(--navy);font-weight:600}
+body[data-scene="water"] #home{display:none}
+body[data-scene="home"] #app{display:none}
 
-.gauge{order:-1;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:4px 14px}
-.gauge .read{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;font-variant-numeric:tabular-nums}
-.gauge .read small{font-size:.8rem;font-weight:500;color:var(--muted)}
-.gauge .read{grid-row:span 2}
-.gauge .zone{font-size:.85rem;color:var(--muted)}
-.stake{display:none}
-.stake .pole{position:absolute;left:18px;top:0;bottom:0;width:10px;border-radius:5px;background:repeating-linear-gradient(180deg,var(--t5) 0 20px,var(--surface) 20px 40px);border:1px solid var(--line)}
-.stake .fill{position:absolute;left:8px;width:30px;bottom:0;height:0;background:var(--bank);border:2px solid var(--bank-edge);border-radius:14px 14px 4px 4px;transition:height 1.2s cubic-bezier(.2,.8,.2,1)}
-.stake .tick{position:absolute;left:34px;right:0;font-size:.66rem;line-height:1;color:var(--muted);transform:translateY(50%);white-space:nowrap}
-.stake .tick::before{content:"";display:inline-block;width:6px;height:1px;background:var(--muted);vertical-align:middle;margin-right:4px}
-.stake .tick.hit{color:var(--ink);font-weight:700}
-.hbar{display:block;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
-.hbar i{display:block;height:100%;width:0;background:var(--ice);transition:width 1.2s}
+/* breaking the ice */
+#breaker{position:fixed;inset:0;z-index:50;background:var(--glacier);color:var(--navy);display:grid;place-items:center;pointer-events:none;opacity:0}
+#breaker.on{opacity:1}
+#breaker p{font-size:22px;font-weight:700;position:relative;z-index:1;margin-top:-90px}
+#breaker svg{position:absolute;left:0;top:50%;width:100%;height:80px;transform:translateY(-50%)}
+#breaker polyline{fill:none;stroke:var(--teal);stroke-width:3;stroke-linejoin:round;stroke-dasharray:1600;stroke-dashoffset:1600}
+#breaker.crack polyline{transition:stroke-dashoffset .6s ease-out;stroke-dashoffset:0}
+#breaker.drop{transition:transform .65s cubic-bezier(.5,0,.8,.4),opacity .65s;transform:translateY(-100%);opacity:0}
 
-.hero{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:22px;align-items:center}
-@media (max-width:560px){.hero{grid-template-columns:minmax(0,1fr)}.hero canvas{justify-self:center}}
-canvas.flake{width:200px;height:200px;max-width:100%}
-.tierlist{display:grid;gap:6px;margin:0;padding:0;list-style:none}
-.tierlist li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:baseline;font-size:.93rem}
-.tierlist .dot{width:12px;height:12px;border-radius:3px;align-self:center}
-.tierlist .pts{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
-.tierlist em{font-style:normal;color:var(--muted)}
-.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.mode{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;display:grid;gap:2px;background:transparent;color:inherit;text-align:left;font:inherit}
-.mode[aria-pressed="true"]{border-color:var(--ice);background:var(--ice-soft)}
-.mode strong{font-family:var(--display);font-size:1rem}
-.mode span{font-size:.85rem;color:var(--muted)}
-.modes-label{font-size:.85rem;font-weight:700}
-
-button{font:inherit;cursor:pointer}
-.btn{background:var(--ice);color:var(--surface);border:0;border-radius:999px;padding:12px 24px;font-weight:700;font-family:var(--display);font-size:1.02rem}
-.btn.ghost{background:transparent;color:var(--ice);border:1.5px solid var(--ice)}
-.btn.small{padding:7px 15px;font-size:.88rem}
-.btn.tiny{padding:4px 11px;font-size:.8rem}
-.btn:disabled{opacity:.45;cursor:default}
-:focus-visible{outline:3px solid var(--ice);outline-offset:2px}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.note{font-size:.85rem;color:var(--muted)}
-
-.playtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.pips{display:flex;gap:6px;flex-wrap:wrap}
-.pips i{width:26px;height:8px;border-radius:4px;background:var(--line)}
-.pips i.now{background:var(--ink)}
-.clock{font-family:var(--mono);font-size:1.05rem;min-width:3ch;text-align:right}
-.clock.low{color:var(--t5)}
-.prompt{text-align:center;font-family:var(--display);font-size:clamp(1.6rem,5.4vw,2.4rem);font-weight:800;line-height:1.15;letter-spacing:-.01em;text-wrap:balance}
-.hint{color:var(--muted);font-size:.93rem}
-#play>.eyebrow,#promptHint{text-align:center}
-.field{display:flex;gap:8px}
-.field input{flex:1;min-width:0;font:inherit;font-size:1.2rem;padding:14px 18px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
-.field input:focus{border-color:var(--ice);outline:none}
-.field input.bad{border-color:var(--t5)}
+/* ---------- game ---------- */
+.prog{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.dots{display:flex;gap:9px}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--glacier);display:block}
+.dots i.done{background:var(--glacier)}
+.dots i.top{background:var(--aurora);border-color:var(--aurora)}
+.dots i.now{background:var(--snow);border-color:var(--snow);box-shadow:0 0 0 4px rgba(244,248,251,.25),0 0 14px var(--glacier)}
+.depth{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.card{padding:24px 22px;display:grid;gap:10px;margin-bottom:16px}
+.qn{font-size:14px;font-weight:700;letter-spacing:.04em;opacity:.85}
+.prompt{font-size:clamp(26px,6.4vw,31px);font-weight:600;line-height:1.25;text-wrap:balance}
+.hint{font-size:16px;opacity:.85}
+.answer{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:12px;align-items:center}
+.answer input{width:100%;min-width:0;font-size:19px;font-weight:600;padding:15px 20px;border-radius:999px;border:2px solid var(--glacier);background:rgba(191,227,242,.14);color:var(--snow);outline:none}
+.answer input::placeholder{color:var(--snow);opacity:.75}
+.answer input:focus{background:rgba(191,227,242,.22);box-shadow:0 0 0 4px rgba(191,227,242,.25)}
 @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.field input.shake{animation:shake .25s}
-.err{color:var(--t5);font-size:.9rem;min-height:1.3em}
-.err.care{color:var(--ink);background:var(--ice-soft);border-radius:12px;padding:10px 12px}
-.timer{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
-.timer i{display:block;height:100%;background:var(--ice);width:100%;transition:width .25s linear}
-.tries{font-size:.85rem;color:var(--muted)}
+.answer input.shake{animation:shake .25s}
+.ring{position:relative;width:64px;height:64px}
+.ring svg{width:64px;height:64px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:5}
+.ring .bg{stroke:rgba(191,227,242,.3)}
+.ring .fg{stroke:var(--snow);stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.ring .flake{position:absolute;inset:0;display:grid;place-items:center}
+.ring .flake svg{width:24px;height:24px;transform:none}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+.ring.low{animation:pulse 1s ease-in-out infinite}
+.note{min-height:24px;font-size:16px;margin:10px 4px 0}
+.note b{color:var(--aurora)}
+.note.care{background:var(--navy);border:1px solid var(--frost-line);border-radius:12px;padding:12px 14px}
+.actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}
 
-.reveal{border-radius:16px;padding:20px;display:grid;gap:6px;justify-items:start;border:2px solid var(--tc);background:var(--bg)}
-.reveal .tname{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,5vw,2.2rem);color:var(--tc);line-height:1}
-.reveal .tpts{font-family:var(--mono);font-size:1rem;color:var(--tc)}
-.reveal .said{font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
-@keyframes pop{from{transform:scale(.92);opacity:.4}to{transform:none;opacity:1}}
-.reveal.anim{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+/* countdown */
+#count{position:fixed;inset:0;z-index:25;display:grid;place-items:center;pointer-events:none}
+#count span{font-size:120px;font-weight:800;color:var(--snow);text-shadow:0 0 30px rgba(191,227,242,.7)}
+@keyframes cd{from{transform:scale(1.4);opacity:0}25%{opacity:1}to{transform:scale(.85);opacity:.15}}
+#count span.go{animation:cd 1s ease-out forwards}
 
-.endtop{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:22px;align-items:center}
-@media (max-width:560px){.endtop{grid-template-columns:minmax(0,1fr)}.endtop canvas{justify-self:center}}
-.big{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,3.8rem);line-height:.95;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.big small{font-size:1.1rem;font-weight:500;color:var(--muted);letter-spacing:0}
-.zonebig{font-family:var(--display);font-weight:700;font-size:1.15rem}
-.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;padding:11px 0;border-bottom:1px solid var(--line)}
-.res:last-child{border-bottom:0}
-.res .q{font-size:.82rem;color:var(--muted)}
-.res .a{font-weight:700;overflow-wrap:anywhere}
-.res .t{text-align:right;align-self:center;display:grid;justify-items:end}
-.res .t b{font-family:var(--display);font-size:.9rem}
-.res .t span{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
-.res details{grid-column:1 / -1;margin-top:4px}
-.res summary{font-size:.85rem;color:var(--ice);cursor:pointer;width:max-content}
-.lst{display:grid;gap:8px;margin-top:8px}
-.lst .tl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:.88rem}
-@media (max-width:480px){.lst .tl{grid-template-columns:minmax(0,1fr)}}
-.lst .tl b{font-family:var(--display)}
-.lst .tl span{color:var(--muted)}
-.sharebox{font-family:var(--mono);font-size:.9rem;white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow-wrap:anywhere}
+/* depth gauge */
+#gauge{position:fixed;right:12px;top:calc(var(--ice) + 70px);bottom:40px;width:62px;z-index:12;pointer-events:none}
+body[data-scene="home"] #gauge{display:none}
+#gauge .tube{position:absolute;right:8px;top:0;bottom:22px;width:10px;border-radius:5px;background:rgba(191,227,242,.18);border:1px solid rgba(191,227,242,.45)}
+#gauge .fill{position:absolute;left:0;right:0;top:0;height:0;border-radius:5px;background:linear-gradient(180deg,var(--glacier),var(--teal));transition:height 1.4s cubic-bezier(.3,.7,.2,1)}
+#gauge .bulb{position:absolute;right:2px;bottom:0;width:22px;height:22px;border-radius:50%;background:rgba(191,227,242,.18);border:1px solid rgba(191,227,242,.45)}
+#gauge .cap{position:absolute;right:0;top:-8px;width:26px;height:2px;background:var(--snow)}
+#gauge .notch{position:absolute;right:24px;transform:translateY(-50%);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;white-space:nowrap}
+#gauge .notch::after{content:"";width:9px;height:2px;background:var(--glacier)}
+#gauge .notch .nm{display:none}
+#gauge .notch.hit{color:var(--aurora)}
+#gauge .notch.hit::after{background:var(--aurora)}
+@media (min-width:860px){#gauge{width:170px}#gauge .notch .nm{display:inline}}
 
+/* the sinking answer */
+.crystal{position:fixed;z-index:28;left:0;top:0;padding:8px 14px;border-radius:12px;background:rgba(191,227,242,.28);border:1.5px solid var(--glacier);color:var(--snow);font-weight:800;font-size:15px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;transform-origin:center}
+.bubble{position:fixed;z-index:27;width:7px;height:7px;border-radius:50%;border:1.5px solid var(--glacier);pointer-events:none}
+.burst{position:fixed;z-index:27;width:60px;height:24px;pointer-events:none}
+.burst path{fill:none;stroke:var(--snow);stroke-width:2;stroke-linecap:round}
+#aurora{position:fixed;left:0;right:0;top:0;height:130px;z-index:26;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(124,242,194,.45),rgba(124,242,194,.1),rgba(124,242,194,.5),transparent) 0 0/200% 100%;
+  -webkit-mask:linear-gradient(180deg,#000,transparent);mask:linear-gradient(180deg,#000,transparent)}
+@keyframes ripple{0%{opacity:0;background-position:0 0}20%{opacity:1}80%{opacity:1}100%{opacity:0;background-position:-200% 0}}
+#aurora.on{animation:ripple 3.2s ease-in-out}
+
+/* result sheet */
+#result{position:fixed;left:0;right:0;bottom:0;z-index:29;padding:0 12px 14px;transform:translateY(110%);visibility:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s .45s}
+#result.up{transform:none;visibility:visible;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+#result .frost{max-width:560px;margin:0 auto;padding:22px;display:grid;gap:8px;background:var(--navy);box-shadow:0 -10px 40px rgba(11,30,45,.6)}
+#result .top{display:flex;align-items:center;gap:12px}
+#result .top svg{width:34px;height:34px}
+#result .tname{font-size:28px;font-weight:800}
+#result .nums{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+#result .said{font-size:16px;opacity:.85;overflow-wrap:anywhere}
+#result .fact{font-size:16px}
+#result .row{display:flex;justify-content:flex-end;margin-top:6px}
+
+/* icons */
+.ic{width:24px;height:24px;color:var(--snow);flex:none}
+.ic.star{color:var(--aurora);fill:rgba(124,242,194,.25);filter:drop-shadow(0 0 6px rgba(124,242,194,.8))}
+.ic.miss{opacity:.5}
+
+/* end */
+#end .card{gap:16px}
+.score{font-size:20px;font-weight:700}
+.bigdepth{font-size:clamp(48px,14vw,64px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.rating{font-size:20px;font-weight:700}
+.rating b{color:var(--aurora)}
+.icons{display:flex;gap:10px;flex-wrap:wrap}
+.icons .ic{width:30px;height:30px}
+.curve svg{width:100%;height:auto;display:block}
+.curve .cap{font-size:15px;opacity:.85}
+.rows{display:grid}
+.rows .r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--frost-line)}
+.rows .q{font-size:14px;opacity:.85;grid-column:1 / -1}
+.rows .a{font-weight:700;overflow-wrap:anywhere}
+.rows .t{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.next{font-size:15px;opacity:.85}
+.ok{font-size:15px;color:var(--aurora);overflow-wrap:anywhere}
 .quotes{display:grid;gap:14px}
 .quote{display:grid;gap:6px}
-.quote label{font-size:.8rem;color:var(--muted)}
-.quote textarea{width:100%;font-family:var(--display);font-size:1.08rem;font-weight:500;padding:12px 14px;border-radius:12px;border:1.5px dashed var(--ice);background:var(--bg);color:var(--ink);resize:vertical;min-height:62px}
-.quote .row{justify-content:flex-end}
-.ok{font-size:.82rem;color:var(--t2)}
+.quote label{font-size:14px;opacity:.85}
+.quote textarea{width:100%;min-height:64px;resize:vertical;font-size:18px;font-weight:600;padding:12px 14px;border-radius:12px;border:2px dashed var(--glacier);background:rgba(191,227,242,.1);color:var(--snow)}
+.quote .row{display:flex;justify-content:flex-end;gap:10px;align-items:center}
 
-.wall{display:grid;gap:18px}
-.wallq{display:grid;gap:8px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border-radius:999px;padding:4px 11px;background:var(--bg);border:1px solid var(--line);font-size:.9rem;overflow-wrap:anywhere}
-.chip.unique{border-color:var(--t5);color:var(--t5)}
-.chip sup{font-family:var(--mono);color:var(--muted);margin-left:3px;font-size:.7rem}
-.empty{color:var(--muted);font-size:.95rem;padding:14px;border:1px dashed var(--line);border-radius:12px}
-
-/* station tools */
-.staff{border-style:dashed}
-.staff table{width:100%;border-collapse:collapse;font-size:.9rem}
-.staff th,.staff td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
-.staff th{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.staff td.n{font-family:var(--mono);text-align:right;width:3ch}
-.staff select,.staff input[type=text],.staff textarea{font:inherit;font-size:.9rem;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
-.staff textarea{width:100%;min-height:90px;font-family:var(--mono);font-size:.8rem}
+/* sheets: how to play, past days, all answers, settings, station tools */
+#sheet{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:16px;background:rgba(11,30,45,.6)}
+#sheet>.frost{background:var(--navy);width:min(600px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:22px;display:grid;gap:14px}
+#sheet .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#sheet .head h2{font-size:24px}
+#sheet .x{width:44px;height:44px;border-radius:50%;border:0;background:transparent;font-size:28px;line-height:1}
+.tiers{display:grid;gap:10px}
+.tiers .tr{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center}
+.tiers .tr small{display:block;opacity:.85;font-size:15px}
+.tiers .pts{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;font-size:15px}
+.lst{display:grid;gap:10px}
+.lst .tl{font-size:15px}
+.lst .tl b{display:inline-flex;gap:6px;align-items:center;vertical-align:middle}
+.lst .tl .ic{width:20px;height:20px}
+.lst .tl span{opacity:.85}
+.days{display:grid;gap:8px}
+.days button{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1px solid var(--frost-line);background:var(--frost);text-align:left;font-weight:600}
+.toggle{display:flex;gap:12px;align-items:flex-start}
+.toggle input{width:22px;height:22px;margin-top:1px;accent-color:var(--aurora);flex:none}
+.staff table{width:100%;border-collapse:collapse;font-size:15px}
+.staff th,.staff td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--frost-line);vertical-align:middle}
+.staff th{font-size:13px;opacity:.85}
+.staff td.n{text-align:right;width:3ch}
+.staff select,.staff input[type=text],.staff textarea{padding:7px 9px;border-radius:8px;border:1.5px solid var(--glacier);background:rgba(191,227,242,.1);color:var(--snow);max-width:100%}
+.staff select option{background:var(--navy)}
+.staff textarea{width:100%;min-height:90px;font-size:13px}
 .tablewrap{overflow-x:auto}
-.toggle{display:flex;gap:10px;align-items:flex-start}
-.toggle input{width:20px;height:20px;margin-top:2px}
-footer{text-align:center;font-size:.8rem;color:var(--muted)}
-footer button{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.8rem;padding:4px}
+.fl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.empty{opacity:.85;font-size:15px;padding:12px;border:1px dashed var(--frost-line);border-radius:12px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
-<canvas id="snow" aria-hidden="true"></canvas>
-<div id="bank" aria-hidden="true"></div>
+<div id="sea" aria-hidden="true"><div class="iceline"></div></div>
+<canvas id="specks" aria-hidden="true"></canvas>
+<div id="sky" aria-hidden="true"><div class="ground"></div></div>
+<div id="aurora" aria-hidden="true"></div>
 
-<div class="wrap">
-  <header>
-    <div style="display:grid;gap:8px">
-      <span class="eyebrow">Study break · before snowflake making</span>
-      <h1>Snowdrift</h1>
-      <p class="lede">Seven prompts about unwinding, studying and McMaster. No timer. Rarer answers pile up more snow. Then turn your answers into quotes for your snowflake.</p>
-    </div>
-    <div class="stats"><span><b id="playerCount">0</b> runs at this station</span><span>Deepest today <b id="deepest">–</b></span></div>
-  </header>
+<button id="menuBtn" aria-label="menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<div id="scrim"></div>
+<nav id="menu" aria-label="menu">
+  <button class="close" id="menuClose" aria-label="close menu">×</button>
+  <button class="item" data-go="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>today's dive</button>
+  <button class="item" data-go="past"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>past days</button>
+  <button class="item" data-go="how"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg>how to play</button>
+  <button class="item" data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>settings</button>
+</nav>
 
-  <div class="stage">
-    <main class="card">
-      <section class="panel" id="start">
-        <div class="hero">
-          <div style="display:grid;gap:14px;min-width:0">
-            <h2>Six kinds of snow</h2>
-            <ul class="tierlist" id="tierList"></ul>
-          </div>
-          <canvas class="flake" id="sampleFlake" width="400" height="400" aria-label="Example snowflake with every tier"></canvas>
-        </div>
-        <div class="row"><button class="btn" id="startBtn">Start</button></div>
-        <p class="note">An answer counts if it's on our list for that prompt. There are over 20,000 ways to say things on the lists, including McMaster spots and services. Typos and different wording are fine. If your answer isn't there, try saying it another way.</p>
-      </section>
-
-      <section class="panel" id="play" hidden>
-        <div class="playtop"><div class="pips" id="pips"></div></div>
-        <span class="eyebrow" id="qNum"></span>
-        <p class="prompt" id="promptText"></p>
-        <p class="hint" id="promptHint"></p>
-        <form id="answerForm" style="display:grid;gap:10px" autocomplete="off">
-          <div class="field"><input type="text" id="answerInput" maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn" type="submit">Enter</button></div>
-          
-          <div class="err" id="err" aria-live="polite"></div>
-          <div class="row" style="justify-content:space-between"><span class="tries" id="tries"></span><button class="btn ghost small" type="button" id="skipBtn">Pass</button></div>
-        </form>
-        <div class="reveal" id="reveal" hidden>
-          <span class="said" id="rSaid"></span>
-          <span class="tname" id="rName"></span>
-          <span class="tpts" id="rPts"></span>
-          <span class="hint" id="rDetail"></span>
-          <div class="row" style="margin-top:8px"><button class="btn small" id="nextBtn">Next</button></div>
-        </div>
-      </section>
-
-      <section class="panel" id="end" hidden>
-        <div class="endtop">
-          <div style="display:grid;gap:8px;min-width:0">
-            <span class="eyebrow" id="endLabel">Your drift</span>
-            <div class="big" id="endCm">0 <small>cm</small></div>
-            <div class="zonebig" id="endZone"></div>
-            <p class="hint" id="endNote"></p>
-          </div>
-          <canvas class="flake" id="myFlake" width="400" height="400" aria-label="Your snowflake"></canvas>
-        </div>
-        <div id="results"></div>
-        <div style="display:grid;gap:8px">
-          <h3>Share your drift</h3>
-          <div class="sharebox" id="shareText"></div>
-          <div class="row"><button class="btn small" id="copyShare">Copy result</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
-        </div>
-      </section>
-    </main>
-
-    <aside class="gauge" aria-label="Snow depth">
-      <div class="read" id="gRead">0<small> cm</small></div>
-      <div class="zone" id="gZone">Bare ground</div>
-      <div class="hbar"><i id="hFill"></i></div>
-      <div class="stake" id="stake"><div class="fill" id="sFill"></div><div class="pole"></div></div>
-    </aside>
+<section id="home">
+  <div class="title"><h1>SNOWDRIFT</h1><p class="tag">one in a snowdrift.</p></div>
+  <div class="base">
+    <button class="btn" id="goBtn">go under</button>
+    <div class="links"><button class="link" data-go="how">how to play</button><button class="link" data-go="past">past days</button></div>
+    <p class="meta" id="homeMeta"></p>
   </div>
+</section>
 
-  <section class="card" id="quotesCard" hidden>
-    <div style="display:grid;gap:6px">
-      <h2>Quotes for your snowflake</h2>
-      <p class="hint">Each one starts from your answer. Edit the words, then write your favourite in the centre or along the arms of your paper snowflake.</p>
+<div id="breaker" aria-hidden="true"><p>breaking the ice…</p><svg viewBox="0 0 1000 80" preserveAspectRatio="none"><polyline points="0,40 90,34 160,48 240,30 320,44 390,26 470,46 540,36 610,52 700,32 780,44 850,28 930,42 1000,36"/></svg></div>
+<div id="count" aria-live="assertive"></div>
+
+<main id="app">
+  <section id="play" hidden>
+    <div class="prog"><div class="dots" id="dots" role="img"></div><span class="depth" id="depth">0 m</span></div>
+    <div class="card frost" id="pcard" hidden>
+      <span class="qn" id="qn"></span>
+      <p class="prompt" id="prompt"></p>
+      <p class="hint" id="phint"></p>
     </div>
-    <div class="quotes" id="quotes"></div>
-    <div class="row"><button class="btn ghost small" id="shuffleBtn">Try different wording</button><button class="btn small" id="againBtn">Next player</button></div>
+    <form id="form" autocomplete="off" hidden>
+      <div class="answer">
+        <input id="inp" type="text" maxlength="60" placeholder="type one answer" aria-label="your answer" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="ring" id="ring" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="28"/><circle class="fg" id="ringFg" cx="32" cy="32" r="28"/></svg>
+          <div class="flake"><svg viewBox="0 0 24 24" fill="none" stroke="#F4F8FB" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></div>
+        </div>
+      </div>
+      <span class="sr" id="srTime" aria-live="polite"></span>
+      <p class="note" id="note" aria-live="polite"></p>
+      <div class="actions"><button class="link" type="button" id="skipBtn">skip</button><button class="btn" type="submit" id="dropBtn">drop</button></div>
+    </form>
   </section>
 
-  <section class="card">
-    <div style="display:grid;gap:6px">
-      <h2>What people said at this station</h2>
-      <p class="hint">Answers from earlier runs on this device, for inspiration while you make your snowflake. Pink answers came from just one person.</p>
+  <section id="end" hidden>
+    <div class="card frost">
+      <p class="score" id="eScore"></p>
+      <p class="bigdepth" id="eDepth"></p>
+      <p class="rating" id="eRating"></p>
+      <div class="icons" id="eIcons"></div>
+      <div class="curve"><svg id="eCurve" viewBox="0 0 320 110" role="img"></svg><p class="cap" id="eCurveCap"></p></div>
+      <div class="rows" id="eRows"></div>
+      <div class="btnrow"><button class="btn" id="shareBtn">share</button><button class="btn line" id="allBtn">see all answers</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
+      <p class="next" id="eNext"></p>
     </div>
-    <div class="wall" id="wall"></div>
+    <div class="card frost">
+      <h2 style="font-size:22px">turn it into a snowflake quote</h2>
+      <p class="hint">each one starts from your answer. change the words, then write your favourite on your paper snowflake.</p>
+      <div class="quotes" id="quotes"></div>
+      <div class="btnrow"><button class="btn line sm" id="reword">try other wording</button><button class="btn teal sm" id="again">next player</button></div>
+    </div>
   </section>
+</main>
 
-  <section class="card staff" id="staff" hidden>
-    <div style="display:grid;gap:6px">
-      <h2>Station tools</h2>
-      <p class="hint">For volunteers. Everything here is saved on this device only.</p>
-    </div>
-    <label class="toggle"><input type="checkbox" id="lenient"><span><b>Lenient mode.</b> Answers that aren't on the list still score Powder (30 cm) instead of being rejected. Gibberish and rude words are still blocked.</span></label>
-    <div style="display:grid;gap:8px">
-      <h3>Answers that weren't on the list</h3>
-      <p class="hint">Add good ones to a tier so they count from now on.</p>
-      <div class="tablewrap" id="missed"></div>
-    </div>
-    <div style="display:grid;gap:8px">
-      <h3>Add an answer</h3>
-      <div class="row"><select id="addPrompt" aria-label="Prompt"></select><input type="text" id="addText" placeholder="Answer, or several separated by |" aria-label="Answer"><select id="addTier" aria-label="Tier"></select><button class="btn small" id="addBtn">Add</button></div>
-      <span class="ok" id="addMsg" aria-live="polite"></span>
-    </div>
-    <div style="display:grid;gap:8px">
-      <h3>Answers you added</h3>
-      <div class="tablewrap" id="custom"></div>
-    </div>
-    <div style="display:grid;gap:8px">
-      <h3>Move to another device</h3>
-      <p class="hint">Copy this text and paste it into Station tools on the other device, then press Import.</p>
-      <textarea id="xfer" aria-label="Station data"></textarea>
-      <div class="row"><button class="btn ghost small" id="exportBtn">Show my data</button><button class="btn ghost small" id="importBtn">Import</button><button class="btn ghost small" id="clearWall">Clear the answer wall</button><span class="ok" id="xferMsg" aria-live="polite"></span></div>
-    </div>
-  </section>
-  <footer><button id="staffLink">Station tools</button></footer>
-</div>
+<div id="gauge" aria-hidden="true"><div class="cap"></div><div class="tube"><div class="fill" id="gFill"></div></div><div class="bulb"></div></div>
+<div id="result" aria-live="polite"><div class="frost">
+  <div class="top" id="rTop"></div>
+  <p class="nums" id="rNums"></p>
+  <p class="said" id="rSaid"></p>
+  <p class="fact" id="rFact"></p>
+  <div class="row"><button class="btn" id="nextBtn">next</button></div>
+</div></div>
+<div id="sheet" hidden><div class="frost" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="head"><h2 id="sheetTitle"></h2><button class="x" id="sheetX" aria-label="close">×</button></div><div id="sheetBody" style="display:grid;gap:14px"></div></div></div>
 
 <script src="match.js"></script>
 <script src="answers.js"></script>
@@ -289,28 +298,40 @@ footer button{background:none;border:0;color:var(--muted);text-decoration:underl
 <script>
 // ---------- content ----------
 const TIERS = [
-  {name:"Flurry",            pts:10,  c:"--t0", sq:"⬜", desc:"The answer almost everyone thinks of first."},
-  {name:"Snow Joke",         pts:15,  c:"--t1", sq:"🟨", desc:"Feels clever, but it's a classic."},
-  {name:"Powder",            pts:30,  c:"--t2", sq:"🟩", desc:"A solid answer, a step past the obvious."},
-  {name:"Hoarfrost",         pts:60,  c:"--t3", sq:"🟦", desc:"Less common. Nice thinking."},
-  {name:"Deep Freeze",       pts:85,  c:"--t4", sq:"🟪", desc:"Rare. Few people go there."},
-  {name:"One in a Snowstorm",pts:100, c:"--t5", sq:"❄️", desc:"A deep cut almost nobody finds."}
+  {name:"slush",              pts:10,  sq:"💧", desc:"the obvious answer."},
+  {name:"thin ice",           pts:15,  sq:"🧊", desc:"the clever pick that everyone else thinks of too."},
+  {name:"snowfall",           pts:30,  sq:"❄️", desc:"a solid, reasonable answer."},
+  {name:"frost",              pts:60,  sq:"💠", desc:"genuinely uncommon."},
+  {name:"deep freeze",        pts:85,  sq:"🥶", desc:"very obscure."},
+  {name:"one in a snowdrift", pts:100, sq:"🌟", desc:"a prize answer almost nobody finds."}
 ];
-const ZONES = [[0,"Bare ground"],[10,"A dusting"],[40,"Ankle deep"],[90,"Knee deep"],[150,"Snow day, classes cancelled"],[220,"Snowman height"],[320,"Up to the windowsills"],[450,"Buried the bus stop"],[580,"Rooftops"],[700,"Record snowfall"]];
-const MAX = 700;
+const ICON = [
+  '<path d="M3.5 16c0-1.9 3.8-3.2 8.5-3.2s8.5 1.3 8.5 3.2-3.8 3.2-8.5 3.2-8.5-1.3-8.5-3.2z"/><path d="M12 3.5c-1.8 2.6-2.8 4-2.8 5.4a2.8 2.8 0 005.6 0c0-1.4-1-2.8-2.8-5.4z"/>',
+  '<path d="M2.5 9h19v7h-19z"/><path d="M9 9l2.2 3-2.4 1.8 1.2 2.2M15.5 9l-1.2 2.8 2 1.6"/>',
+  '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/><path d="M9.8 4.6L12 6.2l2.2-1.6M9.8 19.4l2.2-1.6 2.2 1.6"/>',
+  '<path d="M12 2.5l5 5.5-5 13.5L7 8z"/><path d="M7 8h10M12 2.5v19"/>',
+  '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5L12 12l8-4.5M12 12v9"/><path d="M15.5 9.8l-1.4 2 1.6 1.4-1 2.2"/>',
+  '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6l-5.4 2.9 1.2-6-4.5-4.2 6.1-.7z"/>'
+];
+const MISS = '<circle cx="12" cy="12" r="8"/><path d="M8.5 12h7"/>';
+const MAXPTS = 700, MAXM = 7000, TIME = 25, ICE = 72;
 const ALL = globalThis.SNOW_PROMPTS;
 const BYID = Object.fromEntries(ALL.map(p=>[p.id,p]));
-const DRIFT = ["m1","m2","m4","m5","c1","m6","m7"].map(id=>BYID[id]);
 const M = globalThis.SnowMatch;
+const LANDMARKS = [
+  {d:0,    label:"a seal at its breathing hole · 0 m", x:"58%", w:110, h:44, path:"M6 36c6-14 26-22 50-21 12 .5 22 4 30 10l14-8-4 12 10 10-18-6c-8 6-30 9-52 8C18 40 8 39 6 36z"},
+  {d:500,  label:"a whale passing · 500 m", x:"6%", w:260, h:80, path:"M4 44C34 14 120 6 182 24c22 6 36 18 36 18l28-20-6 26 12 24-36-18c-30 20-110 26-176 6C20 58 8 52 4 44z"},
+  {d:1500, label:"a jellyfish drifting · 1,500 m", x:"52%", w:90, h:120, path:"M10 46a35 35 0 0170 0c0 4-6 6-10 4-4 4-10 4-14 0-4 4-10 4-14 0-4 4-10 4-14 0-4 4-10 4-14 0-4 2-4-2-4-4z M20 52c-4 20 6 30 0 56h5c6-26-4-36 0-56z M38 54c-4 22 6 34 0 62h5c6-28-4-40 0-62z M56 54c-4 22 6 34 0 62h5c6-28-4-40 0-62z M72 52c-4 20 6 30 0 56h5c6-26-4-36 0-56z"},
+  {d:3500, label:"a cold-water coral field · 3,500 m", x:"4%", w:300, h:110, path:"M20 110c0-30-14-40-10-62l6 1c-2 18 8 26 10 40 4-20 18-30 16-58l6 1c2 28-12 40-14 60 8-10 20-14 22-30l6 2c-2 18-16 24-26 46z M120 110c2-40 22-52 18-90h6c4 36-14 50-16 76 10-16 26-18 30-44l6 1c-4 30-22 34-34 57z M200 110c-6-26 10-40 4-70l6-1c6 30-8 42-4 58 6-12 18-14 18-34h6c0 24-14 28-22 47z M240 110c4-20 20-26 22-52l6 1c-2 28-18 34-22 51z"},
+  {d:7000, label:"the seafloor · 7,000 m", floor:true, path:"M0 40C80 20 160 30 240 24s180-20 260-6 160 22 240 12 180-26 260-14v124H0z"}
+];
 
 // ---------- storage (this device only) ----------
-const KEY = {wall:"snowdrift.wall.v3", custom:"snowdrift.custom.v1", missed:"snowdrift.missed.v1", lenient:"snowdrift.lenient.v1"};
+const KEY = {days:"snowdrift.days.v1", scores:"snowdrift.scores.v1", custom:"snowdrift.custom.v1", missed:"snowdrift.missed.v1", lenient:"snowdrift.lenient.v1", sound:"snowdrift.sound.v1"};
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function store(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-let wall = load(KEY.wall, {runs:0, best:{}, answers:{}});
-let custom = load(KEY.custom, {});
-let missed = load(KEY.missed, {});
-let lenient = !!load(KEY.lenient, false);
+let days = load(KEY.days, {}), scores = load(KEY.scores, []), custom = load(KEY.custom, {}), missed = load(KEY.missed, {});
+let lenient = !!load(KEY.lenient, false), sound = !!load(KEY.sound, false);
 
 // ---------- answer lists ----------
 const INDEX = {};
@@ -323,104 +344,198 @@ ALL.forEach(p => rebuild(p.id));
 
 // ---------- helpers ----------
 const $ = id => document.getElementById(id);
-function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
-function zoneFor(cm){ let z = ZONES[0][1]; for(const [d,n] of ZONES) if(cm>=d) z=n; return z; }
-function today(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = ms => new Promise(r => setTimeout(r, ms));
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function metres(pts){ return (pts*10).toLocaleString("en-CA") + " m"; }
+function neg(pts){ return pts ? "−" + metres(pts) : "0 m"; }
+function icon(t){ return t===null || t===undefined ? `<svg class="ic miss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><title>no answer</title>${MISS}</svg>`
+  : `<svg class="ic${t===5?" star":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>${TIERS[t].name}</title>${ICON[t]}</svg>`; }
+function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function today(){ return dstr(new Date()); }
+function hash(s){ let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h>>>0; }
+function rng(seed){ return ()=>{ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1 | seed); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+function shuffled(a, r=Math.random){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(r()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+// each day has its own 7 prompts, the same on every device; the mcmaster exam-season prompt is always 4th
+function dayPrompts(ds){ const r = rng(hash("snowdrift"+ds)); const rest = shuffled(ALL.filter(p=>p.id!=="c1"), r).slice(0,6); rest.splice(3,0,BYID.c1); return rest; }
+// rating: the tier whose points match the average answer
+function ratingFor(pts){ if(!pts) return "still on the surface"; const avg = pts/7; let k = 0; TIERS.forEach((t,i)=>{ if(avg >= t.pts) k = i; }); return TIERS[k].name; }
 
 // ---------- input checks ----------
 const CARE = /\b(kill (my ?self|me)|kms|suicid\w*|want(ing)? to die|wanna die|end (it all|my life)|self ?harm|hurt(ing)? my ?self|unalive|don'?t want to (live|be here))\b/i;
 const RUDE = /\b(f+u+c+k\w*|fck\w*|sh[i1]t\w*|b[i1]tch\w*|cunt\w*|d[i1]ck\w*|cock\w*|puss(y|ies)|slut\w*|wh[o0]re\w*|fag\w*|n[i1]gg\w*|retard\w*|rap(e|ist|ing)|porn\w*|sex(y|ual)?|nazi\w*|hitler|tits?|boobs?|penis|vagina|cum|horny|nude\w*|asshole|dumbass|bastard|wank\w*|twat|kys)\b/i;
 function precheck(p, v){
   const t = v.trim();
-  if(CARE.test(t)) return {care:true, msg:"Thanks for being honest. You don't have to carry that alone. You can call or text 9-8-8 any time, call Good2Talk at 1-866-925-5454, or visit the Student Wellness Centre on campus. A volunteer at this station can help you find support too."};
-  if(t.length<2) return {msg:"Type at least two letters."};
-  if(!/[a-z]/i.test(t)) return {msg:"Use words, not just numbers or symbols."};
-  if(/(.)\1{3,}/i.test(t.replace(/\s/g,"")) && !/^[a-z]+$/i.test(t.replace(/(.)\1+/gi,"$1"))) return {msg:"That doesn't look like a real answer."};
-  if(/^[^aeiouy\s]{5,}$/i.test(t) || /(qwer|asdf|zxcv|hjkl|uiop|jkl;)/i.test(t)) return {msg:"That doesn't look like a real answer."};
-  if(RUDE.test(t)) return {msg:"Keep it friendly. Try another answer."};
-  if(p.one && /\s/.test(t)) return {msg:"One word only for this prompt."};
+  if(CARE.test(t)) return {care:true, msg:"thanks for being honest. you don't have to carry that alone. you can call or text 9-8-8 any time, call good2talk at 1-866-925-5454, or visit the student wellness centre. a volunteer at this table can help you find support too. the timer is paused."};
+  if(t.length<2) return {msg:"type at least two letters."};
+  if(!/[a-z]/i.test(t)) return {msg:"use words, not just numbers or symbols."};
+  if(/(.)\1{3,}/i.test(t.replace(/\s/g,"")) && !/^[a-z]+$/i.test(t.replace(/(.)\1+/gi,"$1"))) return {msg:"that doesn't look like a real answer."};
+  if(/^[^aeiouy\s]{5,}$/i.test(t) || /(qwer|asdf|zxcv|hjkl|uiop|jkl;)/i.test(t)) return {msg:"that doesn't look like a real answer."};
+  if(RUDE.test(t)) return {msg:"keep it friendly. try another answer."};
+  if(p.one && /\s/.test(t)) return {msg:"one word only for this prompt."};
   return null;
 }
 
-// ---------- falling snow + bank + gauge ----------
-const snowC = $("snow"), sctx = snowC.getContext("2d");
-let flakes = [], reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-function sizeSnow(){ const r = devicePixelRatio||1; snowC.width = innerWidth*r; snowC.height = innerHeight*r; sctx.setTransform(r,0,0,r,0,0);
-  const n = Math.round(Math.min(110, innerWidth/12)); flakes = Array.from({length:n},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:1+Math.random()*2.6,s:.3+Math.random()*.9,w:Math.random()*6.28})); }
-let flakeCol = "#fff", intensity = 1;
-function snowFrame(){
-  sctx.clearRect(0,0,innerWidth,innerHeight); sctx.fillStyle = flakeCol; sctx.globalAlpha = .8;
-  for(const f of flakes){ f.y += f.s*intensity; f.w += .01; f.x += Math.sin(f.w)*.35;
-    if(f.y>innerHeight+4){ f.y=-4; f.x=Math.random()*innerWidth; }
-    sctx.beginPath(); sctx.arc(f.x,f.y,f.r,0,6.283); sctx.fill(); }
-  if(!reduce) requestAnimationFrame(snowFrame);
+// ---------- sound (off unless turned on in settings) ----------
+let ac = null;
+function audio(){ if(!sound) return null; try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); return ac; }catch(e){ return null; } }
+function crackSound(){ const a = audio(); if(!a) return; const n = Math.floor(a.sampleRate*.12), b = a.createBuffer(1,n,a.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/n,3); const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); f.type = "highpass"; f.frequency.value = 1800; g.gain.value = .25; s.buffer = b; s.connect(f).connect(g).connect(a.destination); s.start(); }
+function bubbleSound(){ const a = audio(); if(!a) return; const o = a.createOscillator(), g = a.createGain(), t = a.currentTime; o.type = "sine"; o.frequency.setValueAtTime(500+Math.random()*300,t); o.frequency.exponentialRampToValueAtTime(1100,t+.08); g.gain.setValueAtTime(.06,t); g.gain.exponentialRampToValueAtTime(.001,t+.1); o.connect(g).connect(a.destination); o.start(t); o.stop(t+.11); }
+
+// ---------- game state ----------
+const run = {day:null, items:[], i:0, pts:0, live:false, busy:false, deadline:0, timer:null, pending:null, paused:0};
+
+// ---------- world: the sea scrolls down as you sink ----------
+let S = 2600, H = innerHeight, water = false;
+function layout(){
+  H = innerHeight; S = Math.max(2600, H*4);
+  const sea = $("sea"); sea.style.height = (ICE + S + H) + "px";
+  sea.style.background = `linear-gradient(180deg, #BFE3F2 0px, #BFE3F2 ${ICE}px, #3E7C93 ${ICE+2}px, #0B1E2D ${Math.round(ICE + S*.42)}px, #0B1E2D 100%)`;
+  sea.querySelector(".iceline").style.top = ICE + "px";
+  sea.querySelectorAll(".mark").forEach(m => m.remove());
+  LANDMARKS.forEach(L => {
+    const el = document.createElement("div"); el.className = "mark";
+    const y = ICE + L.d/MAXM*S;
+    if(L.floor){
+      el.style.cssText = `left:0;right:0;top:${y - 40}px`;
+      el.innerHTML = `<svg viewBox="0 0 1000 120" preserveAspectRatio="none" style="width:100%;height:${H}px;fill-opacity:.12"><path d="${L.path}"/></svg><div class="lbl" style="position:absolute;left:16px;top:48px">${L.label}</div>`;
+    } else {
+      const k = Math.min(1, innerWidth*.6/L.w);
+      el.style.left = L.x; el.style.top = (L.d===0 ? y + 8 : y - L.h/2) + "px";
+      el.innerHTML = `<svg viewBox="0 0 ${L.w} ${L.h}" width="${Math.round(L.w*k)}" height="${Math.round(L.h*k)}"><path d="${L.path}"/></svg><div class="lbl">${L.label}</div>`;
+    }
+    sea.append(el);
+  });
+  camera(run.pts);
 }
-function setDepth(cm){
-  const frac = Math.min(cm/MAX,1);
-  $("bank").style.height = (28 + frac*Math.min(innerHeight*0.32, 260))+"px";
-  $("sFill").style.height = (frac*100)+"%"; $("hFill").style.width = (frac*100)+"%";
-  $("gRead").innerHTML = `${cm}<small> cm</small>`; $("gZone").textContent = zoneFor(cm);
-  document.querySelectorAll(".stake .tick").forEach(t => t.classList.toggle("hit", cm >= +t.dataset.d));
-  intensity = 1 + frac*1.6;
+function camera(pts){
+  const d = pts*10, travel = Math.max(0, S + ICE - H + 170);
+  $("sea").style.transform = `translateY(${-d/MAXM*travel}px)`;
+  $("gFill").style.height = (Math.min(d/MAXM,1)*100) + "%";
 }
-function buildStake(){
-  const s = $("stake");
-  ZONES.slice(1).forEach(([d,n])=>{ const t=document.createElement("div"); t.className="tick"; t.dataset.d=d; t.style.bottom=(d/MAX*100)+"%"; t.textContent=d; t.title=n; s.append(t); });
+function buildGauge(){
+  TIERS.forEach((t,i) => { const n = document.createElement("div"); n.className = "notch"; n.dataset.t = i; n.style.top = `calc((100% - 22px) * ${(i+.5)/6})`; n.innerHTML = `<span class="nm">${t.name}</span><span>${t.pts}</span>`; $("gauge").append(n); });
+}
+function notchPoint(i){ const r = $("gauge").getBoundingClientRect(); return {x: r.right - 13, y: r.top + (r.height - 22)*((i+.5)/6)}; }
+
+// ---------- particles: falling snow on the surface, slow specks under water ----------
+const cv = $("specks"), cx = cv.getContext("2d");
+let parts = [];
+function sizeParts(){ const r = devicePixelRatio||1; cv.width = innerWidth*r; cv.height = innerHeight*r; cx.setTransform(r,0,0,r,0,0); const n = Math.round(Math.min(90, innerWidth/14)); parts = Array.from({length:n}, ()=>({x:Math.random()*innerWidth, y:Math.random()*innerHeight, r:.8+Math.random()*2.2, s:.25+Math.random()*.7, w:Math.random()*6.28})); }
+function frame(){
+  if(reduce) return;
+  cx.clearRect(0,0,innerWidth,innerHeight); cx.fillStyle = "#F4F8FB";
+  for(const p of parts){
+    if(water){ p.y += p.s*.18; p.w += .006; p.x += Math.sin(p.w)*.15; cx.globalAlpha = .28; }
+    else { p.y += p.s; p.w += .01; p.x += Math.sin(p.w)*.35; cx.globalAlpha = .85; }
+    if(p.y > innerHeight+4){ p.y = -4; p.x = Math.random()*innerWidth; }
+    cx.beginPath(); cx.arc(p.x, p.y, water ? p.r*.7 : p.r, 0, 6.283); cx.fill();
+  }
+  requestAnimationFrame(frame);
 }
 
-// ---------- snowflake ----------
-function drawFlake(canvas, idxs){
-  const ctx = canvas.getContext("2d"), W = canvas.width, c = W/2, R = W*0.45;
-  ctx.clearRect(0,0,W,W); ctx.lineCap="round"; ctx.lineJoin="round";
-  const list = idxs.filter(i=>i!==null && i!==undefined), n = list.length;
-  const arm = R*(0.3+0.7*Math.min(n,7)/7);
-  for(let k=0;k<6;k++){
-    ctx.save(); ctx.translate(c,c); ctx.rotate(k*Math.PI/3);
-    ctx.strokeStyle = cssVar("--ice"); ctx.globalAlpha=.55; ctx.lineWidth = W*.012;
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-arm); ctx.stroke(); ctx.globalAlpha=1;
-    list.slice(0,9).forEach((ti,s)=>{
-      const lvl = ti+1, y = -arm*((s+1)/(Math.min(n,9)+1)), len = R*(.06+.035*lvl)*(1-.4*(s+1)/(Math.min(n,9)+1));
-      ctx.strokeStyle = cssVar(TIERS[ti].c); ctx.lineWidth = W*(.006+.0018*lvl);
-      for(const sd of [-1,1]){
-        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(sd*len*.87,y-len*.5); ctx.stroke();
-        if(lvl>=3){ ctx.beginPath(); ctx.moveTo(sd*len*.5,y-len*.29); ctx.lineTo(sd*len*.5,y-len*.68); ctx.stroke(); }
-        if(lvl>=5){ ctx.beginPath(); ctx.moveTo(sd*len*.5,y-len*.29); ctx.lineTo(sd*len*.85,y-len*.05); ctx.stroke(); }
-      }
-      if(lvl===6){ ctx.fillStyle = cssVar(TIERS[ti].c); ctx.beginPath(); for(let h=0;h<6;h++){const a=h*Math.PI/3; ctx.lineTo(Math.cos(a)*W*.018,y+Math.sin(a)*W*.018);} ctx.closePath(); ctx.fill(); }
-    });
-    ctx.restore();
+// ---------- menu + sheets ----------
+function openMenu(on){ $("menu").classList.toggle("open", on); $("scrim").classList.toggle("on", on); $("menuBtn").setAttribute("aria-expanded", on); if(on) $("menuClose").focus(); }
+$("menuBtn").onclick = ()=>openMenu(true); $("menuClose").onclick = ()=>openMenu(false); $("scrim").onclick = ()=>openMenu(false);
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = ()=>{ openMenu(false); go(b.dataset.go); });
+function go(where){
+  if(where==="today"){ closeSheet(); if(!run.live && !run.busy) toHome(); }
+  if(where==="past") showPast();
+  if(where==="how") showHow();
+  if(where==="settings") showSettings();
+}
+let lastFocus = null;
+function openSheet(title, body){ lastFocus = document.activeElement; $("sheetTitle").textContent = title; const b = $("sheetBody"); b.innerHTML = ""; if(typeof body === "string") b.innerHTML = body; else b.append(body); $("sheet").hidden = false; $("sheetX").focus(); }
+function closeSheet(){ if($("sheet").hidden) return; $("sheet").hidden = true; if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+$("sheetX").onclick = closeSheet;
+$("sheet").addEventListener("click", e => { if(e.target === $("sheet")) closeSheet(); });
+addEventListener("keydown", e => { if(e.key === "Escape"){ if(!$("sheet").hidden) closeSheet(); else openMenu(false); } });
+
+function tierTable(){ return `<div class="tiers">${TIERS.map((t,i)=>`<div class="tr">${icon(i)}<span><b>${t.name}</b><small>${t.desc}</small></span><span class="pts">${t.pts} pts<small>sink ${metres(t.pts)}</small></span></div>`).join("")}</div>`; }
+function showHow(){
+  openSheet("how to play", `<p>seven prompts a day, the same for everyone. after a 3, 2, 1, you have 25 seconds to type one answer.</p>
+  <p>the rarer your answer, the deeper it sinks. typos and different wording are fine, and mcmaster spots and services count. if an answer isn't on our list, try saying it another way.</p>
+  ${tierTable()}
+  <p class="muted">1 point = 10 m. a perfect 700 reaches the seafloor at 7,000 m.</p>`);
+}
+function showPast(){
+  const box = document.createElement("div"); box.className = "days";
+  for(let k=0;k<7;k++){
+    const d = new Date(); d.setDate(d.getDate()-k); const ds = dstr(d), rec = days[ds];
+    const lbl = k===0 ? "today" : k===1 ? "yesterday" : d.toLocaleDateString("en-CA",{weekday:"long", month:"short", day:"numeric"}).toLowerCase();
+    const b = document.createElement("button");
+    b.innerHTML = `<span>${esc(lbl)}</span><span class="muted">${rec ? `${rec.pts} / 700 · ${neg(rec.pts)}` : "not played"}</span>`;
+    b.onclick = ()=>{ closeSheet(); if(!run.live && !run.busy) startDive(ds); };
+    box.append(b);
   }
-  ctx.fillStyle = cssVar("--ice"); ctx.beginPath(); for(let h=0;h<6;h++){const a=h*Math.PI/3+Math.PI/6; ctx.lineTo(c+Math.cos(a)*W*.035,c+Math.sin(a)*W*.035);} ctx.closePath(); ctx.fill();
+  openSheet("past days", box);
+}
+function showSettings(){
+  const box = document.createElement("div"); box.style.cssText = "display:grid;gap:14px";
+  box.innerHTML = `<label class="toggle"><input type="checkbox" id="sndT"${sound?" checked":""}><span><b>sounds</b><br><span class="muted">a soft ice crack and bubbles when an answer sinks.</span></span></label>
+  <p class="muted">falling snow and the sinking animation turn off on their own if your device is set to reduce motion.</p>
+  <div><button class="btn line sm" id="staffOpen">station tools (for volunteers)</button></div>`;
+  openSheet("settings", box);
+  $("sndT").onchange = e => { sound = e.target.checked; store(KEY.sound, sound); if(sound) bubbleSound(); };
+  $("staffOpen").onclick = showStaff;
 }
 
 // ---------- game ----------
-const run = {items:[], i:0, cm:0, locked:false};
-function show(w){ for(const id of ["start","play","end"]) $(id).hidden = id!==w; $("quotesCard").hidden = w!=="end"; }
-
-function shuffled(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-
-$("startBtn").onclick = ()=>{
-  run.i = 0; run.cm = 0; setDepth(0);
-  run.items = DRIFT.map(p=>({p}));
-  show("play"); renderPrompt();
-};
-
-function renderPrompt(){
-  const it = run.items[run.i], p = it.p;
-  const pips = $("pips"); pips.innerHTML = "";
-  run.items.forEach((x,k)=>{ const i=document.createElement("i"); if(k===run.i) i.className="now"; else if(x.r) i.style.background=cssVar(x.r.tier.c); else if(k<run.i) i.style.background=cssVar("--muted"); pips.append(i); });
-  $("qNum").textContent = `Prompt ${run.i+1} of 7`;
-  $("promptText").textContent = p.q; $("promptHint").textContent = p.h;
-  $("answerForm").hidden = false; $("reveal").hidden = true; setErr(""); $("tries").textContent=""; run.locked=false; it.tried = [];
-  const inp = $("answerInput"); inp.value=""; inp.classList.remove("bad"); inp.focus({preventScroll:true});
+function setScene(s){ document.body.dataset.scene = s; water = s === "water"; }
+function toHome(){
+  closeSheet(); clearInterval(run.timer); run.live = false; run.pts = 0; camera(0);
+  $("result").classList.remove("up"); $("play").hidden = true; $("end").hidden = true; setScene("home");
+  const rec = days[today()];
+  $("homeMeta").textContent = rec ? `today's best on this device: ${neg(rec.pts)}` : "seven prompts · about three minutes";
+  window.scrollTo(0,0); $("goBtn").focus({preventScroll:true});
 }
-function setErr(msg, care){ const e=$("err"); e.textContent = msg; e.classList.toggle("care", !!care); }
+$("goBtn").onclick = ()=>startDive(today());
+
+async function startDive(ds){
+  if(run.busy) return; run.busy = true;
+  run.day = ds; run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
+  $("end").hidden = true; $("result").classList.remove("up");
+  document.querySelectorAll("#gauge .notch").forEach(n=>n.classList.remove("hit"));
+  if(document.body.dataset.scene === "home" && !reduce){
+    const br = $("breaker");
+    br.className = "on"; await wait(30); br.classList.add("crack"); crackSound(); await wait(700);
+    setScene("water"); camera(0); br.classList.add("drop"); await wait(680); br.className = "";
+  } else { setScene("water"); camera(0); }
+  $("play").hidden = false; window.scrollTo(0,0);
+  run.busy = false; nextPrompt();
+}
+
+async function nextPrompt(){
+  run.busy = true;
+  const it = run.items[run.i];
+  renderDots(); $("pcard").hidden = true; $("form").hidden = true; $("result").classList.remove("up");
+  for(const n of ["3","2","1"]){ $("count").innerHTML = `<span class="go">${n}</span>`; await wait(1000); }
+  $("count").innerHTML = "";
+  $("qn").textContent = `prompt ${run.i+1} of 7`; $("prompt").textContent = it.p.q; $("phint").textContent = it.p.h || "";
+  $("pcard").hidden = false; $("form").hidden = false; note("");
+  const inp = $("inp"); inp.value = ""; inp.disabled = false; $("dropBtn").disabled = false; $("skipBtn").disabled = false; inp.focus({preventScroll:true});
+  run.pending = null; run.paused = 0; run.live = true; run.busy = false;
+  run.deadline = Date.now() + TIME*1000; lastSpoken = TIME; $("srTime").textContent = "25 seconds";
+  clearInterval(run.timer); tick(); run.timer = setInterval(tick, 200);
+}
+let lastSpoken = TIME;
+const RC = 2*Math.PI*28;
+function tick(){
+  if(run.paused) return;
+  const left = Math.max(0, run.deadline - Date.now()), s = Math.ceil(left/1000);
+  // the ring frosts over with white as time runs out
+  $("ringFg").style.strokeDasharray = RC; $("ringFg").style.strokeDashoffset = RC*(left/(TIME*1000));
+  $("ring").classList.toggle("low", s <= 5 && left > 0);
+  for(const mark of [20,10,5]) if(s <= mark && lastSpoken > mark){ lastSpoken = mark; $("srTime").textContent = `${mark} seconds left`; }
+  if(left <= 0){ clearInterval(run.timer); timeUp(); }
+}
+function note(html, care){ const n = $("note"); n.innerHTML = html; n.classList.toggle("care", !!care); }
+function nudge(){ const i = $("inp"); i.classList.remove("shake"); void i.offsetWidth; i.classList.add("shake"); i.focus(); }
 function judge(p, v){
   const r = M.find(INDEX[p.id], v);
   if(r) return {entry:r.entry, how:r.how};
-  if(lenient) return {entry:{text:v.trim(), tier:2, lenient:true}, how:"lenient"};
+  if(lenient) return {entry:{text:v.trim().toLowerCase(), tier:2, lenient:true}, how:"lenient"};
   return null;
 }
 function logMiss(p, v){
@@ -429,189 +544,215 @@ function logMiss(p, v){
   if(!m[k]) m[k] = {t:v.trim().toLowerCase().slice(0,60), n:0};
   m[k].n++; store(KEY.missed, missed);
 }
-$("answerForm").addEventListener("submit", e=>{
-  e.preventDefault(); if(run.locked) return;
-  const it = run.items[run.i], p = it.p, inp = $("answerInput"), v = inp.value;
-  const bad = precheck(p, v);
-  if(bad){ setErr(bad.msg, bad.care); if(!bad.care) nudge(); return; }
-  const m = judge(p, v);
-  if(m){ if(m.how==="lenient") logMiss(p, v); commit(v, m); return; }
-  logMiss(p, v); it.tried.push(v.trim());
-  setErr(it.tried.length===1 ? "That one's not on our list. Try saying it another way, or try a different answer." : "Still not on the list. Keep trying, or press Pass.");
-  $("tries").textContent = "Tried: " + it.tried.slice(-4).join(", ");
-  inp.select(); nudge();
+$("inp").addEventListener("input", ()=>{
+  if(run.paused){ run.deadline = Date.now() + run.paused; run.paused = 0; }
+  if(!$("note").classList.contains("care")) note("");
 });
-function nudge(){ const inp=$("answerInput"); inp.classList.add("bad"); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); inp.focus(); }
-$("answerInput").addEventListener("input", ()=>{ $("answerInput").classList.remove("bad"); if(!$("err").classList.contains("care")) setErr(""); });
-$("skipBtn").onclick = ()=>{ if(!run.locked) commit("", null); };
+$("form").addEventListener("submit", e => {
+  e.preventDefault(); if(!run.live) return;
+  const it = run.items[run.i], v = $("inp").value, bad = precheck(it.p, v);
+  if(bad){ note(esc(bad.msg), bad.care); if(bad.care){ run.paused = Math.max(1000, run.deadline - Date.now()); $("ring").classList.remove("low"); } else nudge(); return; }
+  const m = judge(it.p, v);
+  if(!m){ logMiss(it.p, v); note("not on our list. try saying it another way."); nudge(); $("inp").select(); return; }
+  const key = M.tokens(v).join(" ");
+  if(m.how === "typo" && !(run.pending && run.pending.key === key)){
+    run.pending = {key}; note(`did you mean <b>${esc(m.entry.text)}</b>? press drop again to confirm.`); return;
+  }
+  if(m.how === "lenient") logMiss(it.p, v);
+  accept(v.trim().slice(0,60), m);
+});
+$("skipBtn").onclick = ()=>{ if(run.live){ run.live = false; clearInterval(run.timer); settle(null, null, "skipped"); } };
+function timeUp(){ if(!run.live) return; run.live = false; settle(null, null, "time"); }
 
-function commit(raw, m){
-  run.locked = true;
-  const it = run.items[run.i], a = raw.trim().slice(0,60);
-  it.a = m ? a : ""; it.m = m;
-  it.r = m ? {tier:TIERS[m.entry.tier], idx:m.entry.tier} : null;
-  if(it.r) run.cm += it.r.tier.pts;
-  setDepth(run.cm);
-  $("answerForm").hidden = true; const rv = $("reveal"); rv.hidden = false;
-  rv.classList.remove("anim"); void rv.offsetWidth; rv.classList.add("anim");
-  if(it.r){
-    rv.style.setProperty("--tc", cssVar(it.r.tier.c));
-    $("rSaid").textContent = `“${a}”`; $("rName").textContent = it.r.tier.name;
-    $("rPts").textContent = `+${it.r.tier.pts} cm`;
+async function accept(a, m){
+  run.live = false; clearInterval(run.timer); $("ring").classList.remove("low");
+  $("inp").disabled = true; $("dropBtn").disabled = true; $("skipBtn").disabled = true;
+  await sink(a, m.entry.tier);
+  settle(a, m);
+}
+function settle(a, m, why){
+  const it = run.items[run.i];
+  it.a = a || ""; it.m = m; it.t = m ? m.entry.tier : null; it.q = m && m.how === "typo" ? m.entry.text : it.a;
+  if(m){ run.pts += TIERS[it.t].pts; camera(run.pts); }
+  $("inp").disabled = true; $("dropBtn").disabled = true; $("skipBtn").disabled = true; $("ring").classList.remove("low");
+  renderDots();
+  const t = it.t;
+  if(m){
+    $("rTop").innerHTML = icon(t) + `<span class="tname"${t===5?' style="color:var(--aurora)"':""}>${TIERS[t].name}</span>`;
+    $("rNums").textContent = `+${TIERS[t].pts} · sink ${metres(TIERS[t].pts)}`;
     const same = M.tokens(a).join(" ") === M.tokens(m.entry.text).join(" ");
-    $("rDetail").textContent = m.how==="lenient" ? "Not on our list yet, so it counts as Powder." : it.r.tier.desc + (same ? "" : ` Counted as “${m.entry.text}”.`);
+    $("rSaid").textContent = `“${a}”` + (same || m.how==="lenient" ? "" : `, counted as “${m.entry.text}”`);
+    $("rFact").textContent = m.how === "lenient" ? "not on our list yet, so it lands in snowfall." : `${cap(TIERS[t].desc)} ${alsoHere(it.p, t, m.entry)}`.toLowerCase();
   } else {
-    rv.style.setProperty("--tc", cssVar("--muted"));
-    $("rSaid").textContent = "Passed";
-    $("rName").textContent = "No snow"; $("rPts").textContent = "+0 cm";
-    const ex = examples(it.p, 3).map(x=>`“${x}”`).join(", ");
-    $("rDetail").textContent = "That's fine. Skipping is part of a calm break." + (ex ? ` Some answers on the list: ${ex}.` : "");
+    $("rTop").innerHTML = icon(null) + `<span class="tname">${why==="time" ? "time's up" : "skipped"}</span>`;
+    $("rNums").textContent = "+0 · stays put";
+    $("rSaid").textContent = why==="time" ? "the ice closed over this one." : "that's fine. skipping is part of a calm break.";
+    const ex = examples(it.p, 3); $("rFact").textContent = ex.length ? `some answers on the list: ${ex.map(x=>`“${x}”`).join(", ")}.` : "";
   }
-  $("nextBtn").textContent = run.i===6 ? "See my drift" : "Next prompt"; renderPips();
-  $("nextBtn").focus({preventScroll:true});
+  $("nextBtn").textContent = run.i === 6 ? "see my dive" : "next";
+  $("result").classList.add("up"); setTimeout(()=>$("nextBtn").focus({preventScroll:true}), 60);
 }
-function examples(p, n){ const pick = shuffled(p.entries.filter(e=>e.tier>=2 && !e.custom)); return pick.slice(0,n).map(e=>e.text); }
-function renderPips(){ [...$("pips").children].forEach((el,k)=>{ const x=run.items[k]; el.className = ""; el.style.background = x.r ? cssVar(x.r.tier.c) : (k<=run.i ? cssVar("--muted") : ""); }); }
-$("nextBtn").onclick = ()=>{
-  if(run.i<6){ run.i++; renderPrompt(); } else finish();
-};
+function alsoHere(p, t, entry){ const o = shuffled(p.entries.filter(e=>e.tier===t && e!==entry && !e.custom)).slice(0,2).map(e=>`“${e.text}”`); return o.length ? `also down here: ${o.join(" and ")}.` : ""; }
+function examples(p, n){ return shuffled(p.entries.filter(e=>e.tier>=2 && !e.custom)).slice(0,n).map(e=>e.text); }
+$("nextBtn").onclick = ()=>{ $("result").classList.remove("up"); if(run.i < 6){ run.i++; nextPrompt(); } else finish(); };
+function renderDots(){
+  $("dots").innerHTML = run.items.map((x,k)=>{ const done = x.a !== undefined; const cls = done ? (x.t===5 ? "top" : "done") : (k===run.i ? "now" : ""); return `<i class="${cls}"></i>`; }).join("");
+  const n = run.items.filter(x=>x.a !== undefined).length;
+  $("dots").setAttribute("aria-label", `${n} of 7 prompts done`);
+  $("depth").textContent = neg(run.pts);
+}
 
-let wording = 0;
+// ---------- the sinking answer ----------
+async function sink(word, t){
+  if(reduce || !document.body.animate){ await wait(250); markNotch(t); if(t===5) aurora(); return; }
+  const input = $("inp").getBoundingClientRect();
+  const el = document.createElement("div"); el.className = "crystal"; el.textContent = word; document.body.append(el);
+  const w = el.offsetWidth, h = el.offsetHeight;
+  const glow = [6,9,13,18,24,32][t], col = t===5 ? "124,242,194" : "191,227,242";
+  el.style.boxShadow = `0 0 ${glow}px rgba(${col},${.35 + t*.1})`;
+  const g = $("gauge").getBoundingClientRect(), end = notchPoint(t);
+  const at = (x, y, s) => `translate(${x - w/2}px,${y - h/2}px) scale(${s})`;
+  const sx = input.left + Math.min(input.width/2, w/2 + 20), sy = input.top + input.height/2;
+  const ix = g.right - 13 - 30, iy = g.top - 8;
+  // 1. the word shrinks into a glowing crystal and rises to the ice line
+  await el.animate([{transform:at(sx,sy,1)}, {transform:at(ix,iy,.55)}], {duration:420, easing:"cubic-bezier(.4,0,.2,1)", fill:"forwards"}).finished;
+  // 2. it cracks through
+  crackSound(); burst(g.right - 13, iy);
+  await wait(200);
+  // 3. it drifts down past the notches, slowing as it nears its tier, glowing brighter the deeper it goes
+  el.style.boxShadow = `0 0 ${glow*1.7}px rgba(${col},${.45 + t*.1})`;
+  const ex = end.x - 30, dur = 520 + t*200;
+  const drift = el.animate([{transform:at(ix,iy,.55)}, {transform:at(ex,end.y,.6)}], {duration:dur, easing:"cubic-bezier(.25,.6,.3,1)", fill:"forwards"});
+  const bub = setInterval(()=>{ const r = el.getBoundingClientRect(); bubble(r.left + r.width/2, r.top); if(Math.random()<.35) bubbleSound(); }, 110);
+  await drift.finished; clearInterval(bub);
+  // 4. it settles with a soft pulse of light
+  markNotch(t);
+  await el.animate([{transform:at(ex,end.y,.6), filter:"brightness(1)"}, {transform:at(ex,end.y,.72), filter:"brightness(1.7)"}, {transform:at(ex,end.y,.6), filter:"brightness(1)"}], {duration:380, easing:"ease-out", fill:"forwards"}).finished;
+  if(t===5) aurora();
+  el.animate([{opacity:1},{opacity:0}], {duration:300, fill:"forwards"}).finished.then(()=>el.remove());
+}
+function markNotch(t){ const n = document.querySelector(`#gauge .notch[data-t="${t}"]`); if(n) n.classList.add("hit"); }
+function bubble(x, y){ const b = document.createElement("div"); b.className = "bubble"; b.style.left = (x - 3 + (Math.random()*10-5)) + "px"; b.style.top = y + "px"; document.body.append(b); b.animate([{transform:"translateY(0)", opacity:.9}, {transform:"translateY(-34px)", opacity:0}], {duration:700, easing:"ease-out"}).finished.then(()=>b.remove()); }
+function burst(x, y){ const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 60 24"); s.setAttribute("class","burst"); s.style.left = (x-30)+"px"; s.style.top = (y-12)+"px"; s.innerHTML = '<path d="M30 12L18 6M30 12L10 13M30 12l12-7M30 12l18 2M30 12l-6 10M30 12l7 9"/>'; document.body.append(s); s.animate([{transform:"scale(.3)", opacity:1}, {transform:"scale(1.2)", opacity:0}], {duration:420, easing:"ease-out"}).finished.then(()=>s.remove()); }
+function aurora(){ const a = $("aurora"); a.classList.remove("on"); void a.offsetWidth; a.classList.add("on"); }
+
+// ---------- end ----------
+let wording = 0, nextTimer = null;
 function finish(){
-  show("end");
-  const answered = run.items.filter(x=>x.a!==undefined);
-  $("endLabel").textContent = "Your drift";
-  $("endCm").innerHTML = `${run.cm} <small>cm of 700</small>`;
-  $("endZone").textContent = zoneFor(run.cm);
-  const top = answered.filter(x=>x.r&&x.r.idx===5).length;
-  $("endNote").textContent = top ? `${top} ${top===1?"answer was":"answers were"} One in a Snowstorm.` : "Every answer still grew your snowflake. Open a prompt below to see what else was on the list.";
-  const res = $("results"); res.innerHTML = "";
-  answered.forEach(x=>{
-    const row=document.createElement("div"); row.className="res";
-    const l=document.createElement("div"); const q=document.createElement("div"); q.className="q"; q.textContent=x.p.q;
-    const a=document.createElement("div"); a.className="a"; a.textContent = x.a || "Passed"; if(!x.a) a.style.color=cssVar("--muted"); l.append(q,a);
-    const t=document.createElement("div"); t.className="t"; const b=document.createElement("b"); const s=document.createElement("span");
-    if(x.r){ b.textContent=x.r.tier.name; b.style.color=cssVar(x.r.tier.c); s.textContent=`+${x.r.tier.pts}`; } else { b.textContent="No snow"; b.style.color=cssVar("--muted"); s.textContent="+0"; }
-    t.append(b,s);
-    const d=document.createElement("details"); const sm=document.createElement("summary"); sm.textContent="See answers on the list"; d.append(sm);
-    d.addEventListener("toggle", ()=>{ if(d.open && !d.dataset.done){ d.dataset.done=1; d.append(listView(x.p)); } });
-    row.append(l,t,d); res.append(row);
+  $("play").hidden = true; $("end").hidden = false; window.scrollTo(0,0);
+  const pts = run.pts;
+  $("eScore").textContent = `${pts} / 700`;
+  $("eDepth").textContent = neg(pts);
+  $("eRating").innerHTML = pts === MAXPTS ? "you reached <b>the seafloor</b>." : `rating: <b>${esc(ratingFor(pts))}</b>`;
+  $("eIcons").innerHTML = run.items.map(x=>icon(x.t)).join("");
+  $("eRows").innerHTML = run.items.map(x=>`<div class="r"><span class="q">${esc(x.p.q)}</span><span class="a">${x.a ? esc(x.a) : '<span class="muted">no answer</span>'}</span><span class="t">${icon(x.t)}${x.t===null ? "+0" : `${esc(TIERS[x.t].name)} · +${TIERS[x.t].pts}`}</span></div>`).join("");
+  const prev = days[run.day]; if(!prev || pts > prev.pts){ days[run.day] = {pts}; store(KEY.days, days); }
+  scores.push(pts); if(scores.length > 1000) scores = scores.slice(-1000); store(KEY.scores, scores);
+  drawCurve(pts); nextDive(); wording = 0; renderQuotes();
+}
+function drawCurve(pts){
+  const real = scores.length >= 8;
+  let mu = 260, sd = 95;
+  if(real){ mu = scores.reduce((a,b)=>a+b,0)/scores.length; sd = Math.max(30, Math.sqrt(scores.reduce((a,b)=>a+(b-mu)**2,0)/scores.length)); }
+  const W = 320, B = 84, X = v => 10 + v/MAXPTS*(W-20), pdf = v => Math.exp(-((v-mu)**2)/(2*sd*sd));
+  let d = `M${X(0)} ${B}`; for(let v=0; v<=MAXPTS; v+=10) d += ` L${X(v).toFixed(1)} ${(B - pdf(v)*(B-10)).toFixed(1)}`; d += ` L${X(MAXPTS)} ${B}Z`;
+  const pct = Math.round(100*.5*(1+erf((pts-mu)/sd/Math.SQRT2)));
+  const f = 'fill="#F4F8FB" font-family="Nunito, sans-serif"';
+  $("eCurve").innerHTML = `<path d="${d}" fill="rgba(191,227,242,.22)" stroke="#BFE3F2" stroke-width="1.5"/>
+    <line x1="${X(pts)}" y1="8" x2="${X(pts)}" y2="${B}" stroke="#7CF2C2" stroke-width="3" stroke-linecap="round"/><circle cx="${X(pts)}" cy="8" r="4" fill="#7CF2C2"/>
+    <text x="${Math.min(Math.max(X(pts),24),W-24)}" y="104" text-anchor="middle" font-size="13" font-weight="700" ${f}>you</text>
+    <text x="10" y="104" font-size="12" ${f}>0</text><text x="${W-10}" y="104" text-anchor="end" font-size="12" ${f}>700</text>`;
+  $("eCurve").setAttribute("aria-label", `score curve with your score of ${pts} marked`);
+  $("eCurveCap").textContent = real ? `deeper than about ${Math.min(99,Math.max(1,pct))}% of the ${scores.length} dives on this device.` : "a rough guess at where you rank. it gets real once more people play on this device.";
+}
+function erf(x){ const s = Math.sign(x); x = Math.abs(x); const t = 1/(1+.3275911*x); return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x)); }
+function nextDive(){
+  const upd = ()=>{ const n = new Date(), m = new Date(n.getFullYear(), n.getMonth(), n.getDate()+1) - n; $("eNext").textContent = `next dive in ${Math.floor(m/3600000)}h ${Math.floor(m%3600000/60000)}m`; };
+  upd(); clearInterval(nextTimer); nextTimer = setInterval(upd, 30000);
+}
+$("shareBtn").onclick = ()=>{
+  const txt = `snowdrift · ${run.day}\n${run.items.map(x=>x.t===null ? "⬛" : TIERS[x.t].sq).join("")}\n${run.pts} / 700 · ${neg(run.pts)}`;
+  const done = m => { $("shareMsg").textContent = m; setTimeout(()=>$("shareMsg").textContent = "", 2400); };
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>done("copied"), ()=>done(txt)); else done(txt);
+};
+$("allBtn").onclick = ()=>{
+  const box = document.createElement("div"); box.style.cssText = "display:grid;gap:18px";
+  run.items.forEach(x=>{
+    const sec = document.createElement("div"); sec.style.cssText = "display:grid;gap:8px";
+    sec.innerHTML = `<h3 style="font-size:17px">${esc(x.p.q)}</h3>`;
+    const l = document.createElement("div"); l.className = "lst";
+    for(let t=5; t>=0; t--){
+      const all = x.p.entries.filter(e=>e.tier===t); if(!all.length) continue;
+      const r = document.createElement("div"); r.className = "tl";
+      r.innerHTML = `<b>${icon(t)} ${esc(TIERS[t].name)}</b> <span>${esc(shuffled(all).slice(0,10).map(e=>e.text).join(", "))}${all.length>10 ? `, and ${all.length-10} more` : ""}</span>`;
+      l.append(r);
+    }
+    sec.append(l); box.append(sec);
   });
-  const squares = answered.map(x=>x.r?x.r.tier.sq:"⬛").join("");
-  $("shareText").textContent = `Snowdrift ${today()}\n${squares}\n${run.cm} cm · ${zoneFor(run.cm)}`;
-  drawFlake($("myFlake"), answered.map(x=>x.r?x.r.idx:null));
-  wording = 0; renderQuotes();
-  saveRun(answered);
-  window.scrollTo({top:0,behavior:reduce?"auto":"smooth"});
-}
-function listView(p){
-  const box=document.createElement("div"); box.className="lst";
-  for(let t=5;t>=0;t--){
-    const es = shuffled(p.entries.filter(e=>e.tier===t)).slice(0,10); if(!es.length) continue;
-    const r=document.createElement("div"); r.className="tl";
-    const b=document.createElement("b"); b.textContent=TIERS[t].name; b.style.color=cssVar(TIERS[t].c);
-    const s=document.createElement("span"); s.textContent = es.map(e=>e.text).join(", ") + (p.entries.filter(e=>e.tier===t).length>10 ? ", and more" : "");
-    r.append(b,s); box.append(r);
-  }
-  return box;
-}
-$("copyShare").onclick = ()=>{
-  const txt = $("shareText").textContent;
-  navigator.clipboard.writeText(txt).then(()=>{ $("shareMsg").textContent="Copied"; setTimeout(()=>$("shareMsg").textContent="",1600); })
-    .catch(()=>{ const r=document.createRange(); r.selectNodeContents($("shareText")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); $("shareMsg").textContent="Selected. Press Ctrl+C to copy."; });
+  openSheet("all answers", box);
 };
 function renderQuotes(){
-  const box=$("quotes"); box.innerHTML=""; let any=false;
+  const box = $("quotes"); box.innerHTML = ""; let any = false;
   run.items.forEach((x,k)=>{
-    if(!x.a) return; any=true;
-    const tpl = x.p.t[(wording+k)%x.p.t.length], id="quote"+k;
-    const w=document.createElement("div"); w.className="quote";
-    const lab=document.createElement("label"); lab.htmlFor=id; lab.textContent=`From “${x.a}”`;
-    const ta=document.createElement("textarea"); ta.id=id; ta.rows=2; ta.value=cap(tpl.replace("{a}",x.a));
-    const row=document.createElement("div"); row.className="row";
-    const msg=document.createElement("span"); msg.className="ok"; msg.setAttribute("aria-live","polite");
-    const b=document.createElement("button"); b.type="button"; b.className="btn ghost small"; b.textContent="Copy";
-    b.onclick=()=>navigator.clipboard.writeText(ta.value).then(()=>{msg.textContent="Copied";setTimeout(()=>msg.textContent="",1600);}).catch(()=>{ta.focus();ta.select();msg.textContent="Selected. Press Ctrl+C to copy.";});
-    row.append(msg,b); w.append(lab,ta,row); box.append(w);
+    if(!x.a) return; any = true;
+    const tpl = x.p.t[(wording+k) % x.p.t.length], id = "quote"+k;
+    const w = document.createElement("div"); w.className = "quote";
+    w.innerHTML = `<label for="${id}">from “${esc(x.q || x.a)}”</label><textarea id="${id}" rows="2"></textarea><div class="row"><span class="ok" aria-live="polite"></span><button class="btn line sm" type="button">copy</button></div>`;
+    const ta = w.querySelector("textarea"), msg = w.querySelector(".ok"); ta.value = cap(tpl.replace("{a}", x.q || x.a));
+    w.querySelector("button").onclick = ()=>{ (navigator.clipboard ? navigator.clipboard.writeText(ta.value) : Promise.reject()).then(()=>{ msg.textContent = "copied"; setTimeout(()=>msg.textContent = "", 1600); }).catch(()=>{ ta.focus(); ta.select(); msg.textContent = "selected. press ctrl+c to copy."; }); };
+    box.append(w);
   });
-  if(!any) box.innerHTML = `<p class="empty">You passed every prompt, so there's nothing to build from yet. Borrow an answer from the list below, or play again.</p>`;
+  if(!any) box.innerHTML = `<p class="empty">no answers this time, so there's nothing to build from. open “see all answers” and borrow one.</p>`;
 }
-$("shuffleBtn").onclick = ()=>{ wording++; renderQuotes(); };
-$("againBtn").onclick = ()=>{ setDepth(0); show("start"); window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); };
+$("reword").onclick = ()=>{ wording++; renderQuotes(); };
+$("again").onclick = toHome;
 
-// ---------- station wall ----------
-function saveRun(answered){
-  wall.runs = (wall.runs||0) + 1;
-  const t = today(); if((!wall.best || wall.best.date!==t || run.cm > wall.best.cm)) wall.best = {date:t, cm: Math.max(run.cm, wall.best && wall.best.date===t ? wall.best.cm : 0)};
-  answered.forEach(x=>{ if(!x.a || !x.m) return; const label = x.m.how==="lenient" ? x.a.toLowerCase() : x.m.entry.text; const g = wall.answers[x.p.id] || (wall.answers[x.p.id] = {}); g[label] = (g[label]||0) + 1; });
-  store(KEY.wall, wall); renderWall();
-}
-function renderWall(){
-  $("playerCount").textContent = wall.runs||0;
-  $("deepest").textContent = wall.best && wall.best.date===today() ? wall.best.cm+" cm" : "–";
-  const box=$("wall"); box.innerHTML="";
-  const blocks = DRIFT.map(p=>({p, g:wall.answers[p.id]||{}})).filter(b=>Object.keys(b.g).length);
-  if(!blocks.length){ box.innerHTML = `<p class="empty">Answers show up here as people finish a run on this device.</p>`; return; }
-  blocks.forEach(({p,g})=>{
-    const sec=document.createElement("div"); sec.className="wallq";
-    const h=document.createElement("h3"); h.textContent=p.q;
-    const chips=document.createElement("div"); chips.className="chips";
-    Object.entries(g).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,40).forEach(([label,count])=>{
-      const c=document.createElement("span"); c.className="chip"+(count===1?" unique":""); c.textContent=label;
-      if(count>1){ const s=document.createElement("sup"); s.textContent="×"+count; c.append(s); }
-      chips.append(c);
-    });
-    sec.append(h,chips); box.append(sec);
-  });
-}
-
-// ---------- station tools ----------
-function openStaff(){ $("staff").hidden = false; renderStaff(); $("staff").scrollIntoView({behavior:reduce?"auto":"smooth"}); }
-$("staffLink").onclick = openStaff;
-addEventListener("keydown", e=>{ if(e.ctrlKey && e.shiftKey && (e.key==="S"||e.key==="s")){ e.preventDefault(); openStaff(); } });
-if(location.hash==="#staff") setTimeout(openStaff, 50);
-$("lenient").onchange = e=>{ lenient = e.target.checked; store(KEY.lenient, lenient); };
+// ---------- station tools (settings → station tools, ctrl+shift+s, or #staff) ----------
 function tierSelect(sel){ return TIERS.map((t,i)=>`<option value="${i}"${i===sel?" selected":""}>${esc(t.name)} (${t.pts})</option>`).join(""); }
-function renderStaff(){
-  $("lenient").checked = lenient;
-  $("addPrompt").innerHTML = DRIFT.map(p=>`<option value="${p.id}">${esc(p.q)}</option>`).join("");
+function showStaff(){
+  const box = document.createElement("div"); box.className = "staff"; box.style.cssText = "display:grid;gap:18px";
+  box.innerHTML = `<p class="muted">everything here is saved on this device only.</p>
+  <label class="toggle"><input type="checkbox" id="lenT"${lenient?" checked":""}><span><b>lenient mode.</b> answers that aren't on the list land in snowfall (30) instead of being turned away. gibberish and rude words are still blocked.</span></label>
+  <div style="display:grid;gap:8px"><h3>answers that weren't on the list</h3><p class="muted">add good ones to a tier so they count from now on.</p><div class="tablewrap" id="missed"></div></div>
+  <div style="display:grid;gap:8px"><h3>add an answer</h3><div class="fl"><select id="addPrompt" aria-label="prompt"></select><input type="text" id="addText" placeholder="answer, or several separated by |" aria-label="answer"><select id="addTier" aria-label="tier"></select><button class="btn sm" id="addBtn">add</button></div><span class="ok" id="addMsg" aria-live="polite"></span></div>
+  <div style="display:grid;gap:8px"><h3>answers you added</h3><div class="tablewrap" id="custom"></div></div>
+  <div style="display:grid;gap:8px"><h3>move to another device</h3><p class="muted">copy this text, paste it into station tools on the other device, then press import.</p><textarea id="xfer" aria-label="station data"></textarea>
+  <div class="fl"><button class="btn line sm" id="exportBtn">show my data</button><button class="btn line sm" id="importBtn">import</button><button class="btn line sm" id="clearScores">clear scores on this device</button><span class="ok" id="xferMsg" aria-live="polite"></span></div></div>`;
+  openSheet("station tools", box);
+  $("lenT").onchange = e => { lenient = e.target.checked; store(KEY.lenient, lenient); };
+  $("addPrompt").innerHTML = ALL.map(p=>`<option value="${p.id}">${esc(p.q)}</option>`).join("");
   $("addTier").innerHTML = tierSelect(3);
+  $("addBtn").onclick = ()=>{ const ok = addCustom($("addPrompt").value, $("addText").value, +$("addTier").value); $("addMsg").textContent = ok ? "added. it counts from now on." : "type an answer first."; if(ok){ $("addText").value = ""; renderStaff(); } setTimeout(()=>$("addMsg").textContent = "", 2500); };
+  $("exportBtn").onclick = ()=>{ $("xfer").value = JSON.stringify({custom, missed}); $("xfer").select(); $("xferMsg").textContent = "copy the text above."; };
+  $("importBtn").onclick = ()=>{
+    try{
+      const d = JSON.parse($("xfer").value);
+      if(d.custom) for(const [pid, list] of Object.entries(d.custom)) if(BYID[pid] && Array.isArray(list)) list.forEach(c=>{ if(c && typeof c.t==="string" && c.tier>=0 && c.tier<=5 && !(custom[pid]||[]).some(x=>x.t===c.t)) (custom[pid]||(custom[pid]=[])).push({t:c.t.slice(0,200), tier:c.tier|0}); });
+      store(KEY.custom, custom); ALL.forEach(p=>rebuild(p.id)); renderStaff(); $("xferMsg").textContent = "imported the added answers.";
+    }catch(e){ $("xferMsg").textContent = "that text isn't valid station data."; }
+  };
+  $("clearScores").onclick = e => { const b = e.target; if(b.dataset.sure){ scores = []; days = {}; store(KEY.scores, scores); store(KEY.days, days); b.textContent = "clear scores on this device"; delete b.dataset.sure; $("xferMsg").textContent = "scores cleared."; } else { b.dataset.sure = 1; b.textContent = "press again to clear"; } };
+  renderStaff();
+}
+function renderStaff(){
   const rows = [];
   for(const [pid, m] of Object.entries(missed)) for(const [k, v] of Object.entries(m)) rows.push({pid, k, ...v});
   rows.sort((a,b)=>b.n-a.n);
-  $("missed").innerHTML = rows.length ? `<table><thead><tr><th>Answer</th><th>Prompt</th><th>Times</th><th>Add as</th><th></th></tr></thead><tbody>${rows.slice(0,80).map((r,i)=>`<tr><td>${esc(r.t)}</td><td class="muted">${esc(BYID[r.pid] ? BYID[r.pid].q : r.pid)}</td><td class="n">${r.n}</td><td><select data-i="${i}" aria-label="Tier for ${esc(r.t)}">${tierSelect(3)}</select></td><td class="row" style="flex-wrap:nowrap"><button class="btn tiny" data-add="${i}">Add</button><button class="btn ghost tiny" data-dis="${i}">Dismiss</button></td></tr>`).join("")}</tbody></table>` : `<p class="empty">Nothing yet. Answers that don't match any list show up here.</p>`;
-  $("missed").querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{ const r=rows[+b.dataset.add]; const tier=+$("missed").querySelector(`select[data-i="${b.dataset.add}"]`).value; addCustom(r.pid, r.t, tier); delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
-  $("missed").querySelectorAll("[data-dis]").forEach(b=>b.onclick=()=>{ const r=rows[+b.dataset.dis]; delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
+  $("missed").innerHTML = rows.length ? `<table><thead><tr><th>answer</th><th>prompt</th><th>times</th><th>add as</th><th></th></tr></thead><tbody>${rows.slice(0,80).map((r,i)=>`<tr><td>${esc(r.t)}</td><td class="muted">${esc(BYID[r.pid] ? BYID[r.pid].q : r.pid)}</td><td class="n">${r.n}</td><td><select data-i="${i}" aria-label="tier for ${esc(r.t)}">${tierSelect(3)}</select></td><td><div class="fl" style="flex-wrap:nowrap"><button class="btn sm" data-add="${i}">add</button><button class="btn line sm" data-dis="${i}">dismiss</button></div></td></tr>`).join("")}</tbody></table>` : `<p class="empty">nothing yet. answers that don't match any list show up here.</p>`;
+  $("missed").querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{ const r = rows[+b.dataset.add]; const tier = +$("missed").querySelector(`select[data-i="${b.dataset.add}"]`).value; addCustom(r.pid, r.t, tier); delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
+  $("missed").querySelectorAll("[data-dis]").forEach(b=>b.onclick=()=>{ const r = rows[+b.dataset.dis]; delete missed[r.pid][r.k]; store(KEY.missed, missed); renderStaff(); });
   const cs = []; for(const [pid, list] of Object.entries(custom)) list.forEach((c,j)=>cs.push({pid, j, ...c}));
-  $("custom").innerHTML = cs.length ? `<table><thead><tr><th>Answer</th><th>Prompt</th><th>Tier</th><th></th></tr></thead><tbody>${cs.map((c,i)=>`<tr><td>${esc(c.t)}</td><td class="muted">${esc(BYID[c.pid] ? BYID[c.pid].q : c.pid)}</td><td>${esc(TIERS[c.tier].name)}</td><td><button class="btn ghost tiny" data-rm="${i}">Remove</button></td></tr>`).join("")}</tbody></table>` : `<p class="empty">None yet.</p>`;
-  $("custom").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ const c=cs[+b.dataset.rm]; custom[c.pid].splice(c.j,1); store(KEY.custom, custom); rebuild(c.pid); renderStaff(); });
+  $("custom").innerHTML = cs.length ? `<table><thead><tr><th>answer</th><th>prompt</th><th>tier</th><th></th></tr></thead><tbody>${cs.map((c,i)=>`<tr><td>${esc(c.t)}</td><td class="muted">${esc(BYID[c.pid] ? BYID[c.pid].q : c.pid)}</td><td>${esc(TIERS[c.tier].name)}</td><td><button class="btn line sm" data-rm="${i}">remove</button></td></tr>`).join("")}</tbody></table>` : `<p class="empty">none yet.</p>`;
+  $("custom").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ const c = cs[+b.dataset.rm]; custom[c.pid].splice(c.j,1); store(KEY.custom, custom); rebuild(c.pid); renderStaff(); });
 }
 function addCustom(pid, text, tier){
   text = String(text).trim().slice(0,200); if(!text || !BYID[pid]) return false;
   (custom[pid] || (custom[pid] = [])).push({t:text, tier}); store(KEY.custom, custom); rebuild(pid); return true;
 }
-$("addBtn").onclick = ()=>{ const ok = addCustom($("addPrompt").value, $("addText").value, +$("addTier").value); $("addMsg").textContent = ok ? "Added. It counts from now on." : "Type an answer first."; if(ok){ $("addText").value=""; renderStaff(); } setTimeout(()=>$("addMsg").textContent="",2500); };
-$("exportBtn").onclick = ()=>{ $("xfer").value = JSON.stringify({custom, missed, wall}); $("xfer").select(); $("xferMsg").textContent = "Copy the text above."; };
-$("importBtn").onclick = ()=>{
-  try{
-    const d = JSON.parse($("xfer").value);
-    if(d.custom) for(const [pid, list] of Object.entries(d.custom)) if(BYID[pid] && Array.isArray(list)) list.forEach(c=>{ if(c && typeof c.t==="string" && c.tier>=0 && c.tier<=5 && !(custom[pid]||[]).some(x=>x.t===c.t)) (custom[pid]||(custom[pid]=[])).push({t:c.t.slice(0,200), tier:c.tier|0}); });
-    store(KEY.custom, custom); ALL.forEach(p=>rebuild(p.id)); renderStaff(); $("xferMsg").textContent = "Imported the added answers.";
-  }catch(e){ $("xferMsg").textContent = "That text isn't valid station data."; }
-};
-$("clearWall").onclick = ()=>{ if($("clearWall").dataset.sure){ wall = {runs:0, best:{}, answers:{}}; store(KEY.wall, wall); renderWall(); $("clearWall").textContent="Clear the answer wall"; delete $("clearWall").dataset.sure; $("xferMsg").textContent="Wall cleared."; } else { $("clearWall").dataset.sure=1; $("clearWall").textContent="Press again to clear"; } };
+addEventListener("keydown", e => { if(e.ctrlKey && e.shiftKey && (e.key==="S"||e.key==="s")){ e.preventDefault(); showStaff(); } });
 
 // ---------- boot ----------
-function themeRefresh(){
-  flakeCol = cssVar("--flakes");
-  drawFlake($("sampleFlake"), [0,1,2,3,4,5,2]);
-  if(!$("end").hidden) drawFlake($("myFlake"), run.items.filter(x=>x.a!==undefined).map(x=>x.r?x.r.idx:null));
-  if(reduce) snowFrame();
-}
-$("tierList").innerHTML = TIERS.map(t=>`<li><span class="dot" style="background:var(${t.c})"></span><span><b>${t.name}</b> <em>${t.desc}</em></span><span class="pts">${t.pts}</span></li>`).join("");
-buildStake(); sizeSnow(); themeRefresh(); setDepth(0); renderWall();
-addEventListener("resize", ()=>{ sizeSnow(); setDepth(run.cm); if(reduce) snowFrame(); });
-snowFrame();
-try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeRefresh); }catch(e){}
-new MutationObserver(themeRefresh).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+buildGauge(); sizeParts(); layout(); toHome(); frame();
+addEventListener("resize", ()=>{ sizeParts(); layout(); });
+if(location.hash === "#staff") setTimeout(showStaff, 50);
 </script>

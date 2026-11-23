@@ -73,15 +73,20 @@
   }
   const allow = n => n <= 4 ? 0 : n <= 7 ? 1 : n <= 13 ? 2 : 3;
   const tokEq = (a, b) => a === b || (Math.min(a.length, b.length) >= 6 && a[0] === b[0] && osa(a, b, 1) <= 1);
+  // single words too generic to count when they appear inside a longer answer
+  const WEAK = new Set("new you not pass tell make good time day list feel out up more best life eat see say use work school class exam study mac msu student campus servic center help support resourc place thing one get lot".split(" "));
   const NEG = new Set(["no", "not", "dont", "never", "without", "cant", "wont", "stop", "avoid"]);
 
   // entries: [{text, aliases:[...], tier}]
   function buildIndex(entries) {
-    const exact = new Map(), sorted = new Map(), flat = new Map(), list = [];
+    const exact = new Map(), sorted = new Map(), flat = new Map(), list = [], wild = [];
     for (const e of entries) {
       for (const al of [e.text, ...(e.aliases || [])]) {
+        // "* club" = any one word, then club
+        if (al.includes("*")) { const wt = tokens(al.replace(/\*/g, "zzwild")).map(t => t === "zzwild" ? "*" : t); if (wt.length) wild.push({ e, tk: wt }); continue; }
         const tk = tokens(al); if (!tk.length) continue;
-        const rec = { e, tk, flat: tk.join(""), raw: tokens(al, true).join("") };
+        const words = clean(al).split(" ").length;
+        const rec = { e, tk, flat: tk.join(""), raw: tokens(al, true).join(""), loose: !(tk.length === 1 && (words >= 3 || WEAK.has(tk[0]))) };
         const k = tk.join(" "), ks = tk.slice().sort().join(" ");
         if (!exact.has(k)) exact.set(k, rec);
         if (!sorted.has(ks)) sorted.set(ks, rec);
@@ -89,7 +94,7 @@
         list.push(rec);
       }
     }
-    return { exact, sorted, flat, list };
+    return { exact, sorted, flat, list, wild };
   }
   // returns {entry, how: "exact"|"typo"|"contains"} or null
   function find(index, input) {
@@ -97,6 +102,7 @@
     const k = tk.join(" "), f = tk.join(""), fr = tokens(input, true).join("");
     let r = index.exact.get(k) || index.sorted.get(tk.slice().sort().join(" ")) || index.flat.get(f);
     if (r) return { entry: r.e, how: "exact" };
+    for (const w of index.wild || []) if (w.tk.length === tk.length && w.tk.every((x, i) => x === "*" || tokEq(tk[i], x))) return { entry: w.e, how: "wild" };
     // whole-answer typo
     const max = allow(f.length);
     if (max > 0) {
@@ -118,7 +124,7 @@
     const neg = tk.some(t => NEG.has(t));
     let best = null;
     for (const rec of index.list) {
-      if (rec.tk.length > tk.length || tk.length - rec.tk.length > 3) continue;
+      if (!rec.loose || rec.tk.length > tk.length || tk.length - rec.tk.length > 3) continue;
       if (rec.tk.length === 1 && rec.tk[0].length < 3) continue;
       if (neg && !rec.tk.some(t => NEG.has(t))) continue;
       let i = 0;

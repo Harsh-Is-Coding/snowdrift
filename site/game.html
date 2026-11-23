@@ -270,8 +270,8 @@ body[data-scene="home"] #gauge{display:none}
       <div class="icons" id="eIcons"></div>
       <div class="curve"><svg id="eCurve" viewBox="0 0 320 110" role="img"></svg><p class="cap" id="eCurveCap"></p></div>
       <div class="rows" id="eRows"></div>
-      <div class="btnrow"><button class="btn" id="shareBtn">share</button><button class="btn line" id="allBtn">see all answers</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
-      <p class="next" id="eNext"></p>
+      <div class="btnrow"><button class="btn" id="playAgain">play again</button><button class="btn line" id="shareBtn">share</button><button class="btn line" id="allBtn">see all answers</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
+      
     </div>
     <div class="card frost">
       <h2 style="font-size:22px">turn it into a snowflake quote</h2>
@@ -330,7 +330,7 @@ const LANDMARKS = [
 const KEY = {days:"snowdrift.days.v1", scores:"snowdrift.scores.v1", custom:"snowdrift.custom.v1", missed:"snowdrift.missed.v1", lenient:"snowdrift.lenient.v1", sound:"snowdrift.sound.v1"};
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function store(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-let days = load(KEY.days, {}), scores = load(KEY.scores, []), custom = load(KEY.custom, {}), missed = load(KEY.missed, {});
+let custom = load(KEY.custom, {}), missed = load(KEY.missed, {});
 let lenient = !!load(KEY.lenient, false), sound = !!load(KEY.sound, false);
 
 // ---------- answer lists ----------
@@ -349,7 +349,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 function metres(pts){ return (pts*10).toLocaleString("en-CA") + " m"; }
-function neg(pts){ return pts ? "−" + metres(pts) : "0 m"; }
+function neg(pts){ return metres(pts); }
 function icon(t){ return t===null || t===undefined ? `<svg class="ic miss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><title>no answer</title>${MISS}</svg>`
   : `<svg class="ic${t===5?" star":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>${TIERS[t].name}</title>${ICON[t]}</svg>`; }
 function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
@@ -357,8 +357,10 @@ function today(){ return dstr(new Date()); }
 function hash(s){ let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h>>>0; }
 function rng(seed){ return ()=>{ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1 | seed); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
 function shuffled(a, r=Math.random){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(r()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
-// each day has its own 7 prompts, the same on every device; the mcmaster exam-season prompt is always 4th
-function dayPrompts(ds){ const r = rng(hash("snowdrift"+ds)); const rest = shuffled(ALL.filter(p=>p.id!=="c1"), r).slice(0,6); rest.splice(3,0,BYID.c1); return rest; }
+// 7 prompts per dive; the mcmaster services prompt is always 4th.
+// a day's first dive uses that day's set (the same on every device); "play again" deals a fresh random set.
+function promptSet(r){ const rest = shuffled(ALL.filter(p=>p.id!=="c1"), r).slice(0,6); rest.splice(3,0,BYID.c1); return rest; }
+function dayPrompts(ds){ return ds ? promptSet(rng(hash("snowdrift"+ds))) : promptSet(Math.random); }
 // rating: the tier whose points match the average answer
 function ratingFor(pts){ if(!pts) return "still on the surface"; const avg = pts/7; let k = 0; TIERS.forEach((t,i)=>{ if(avg >= t.pts) k = i; }); return TIERS[k].name; }
 
@@ -454,7 +456,7 @@ addEventListener("keydown", e => { if(e.key === "Escape"){ if(!$("sheet").hidden
 
 function tierTable(){ return `<div class="tiers">${TIERS.map((t,i)=>`<div class="tr">${icon(i)}<span><b>${t.name}</b><small>${t.desc}</small></span><span class="pts">${t.pts} pts<small>sink ${metres(t.pts)}</small></span></div>`).join("")}</div>`; }
 function showHow(){
-  openSheet("how to play", `<p>seven prompts a day, the same for everyone. after a 3, 2, 1, you have 25 seconds to type one answer.</p>
+  openSheet("how to play", `<p>seven prompts per dive. after a 3, 2, 1, you have 25 seconds to type one answer.</p>
   <p>the rarer your answer, the deeper it sinks. typos and different wording are fine, and mcmaster spots and services count. if an answer isn't on our list, try saying it another way.</p>
   ${tierTable()}
   <p class="muted">1 point = 10 m. a perfect 700 reaches the seafloor at 7,000 m.</p>`);
@@ -462,10 +464,10 @@ function showHow(){
 function showPast(){
   const box = document.createElement("div"); box.className = "days";
   for(let k=0;k<7;k++){
-    const d = new Date(); d.setDate(d.getDate()-k); const ds = dstr(d), rec = days[ds];
+    const d = new Date(); d.setDate(d.getDate()-k); const ds = dstr(d);
     const lbl = k===0 ? "today" : k===1 ? "yesterday" : d.toLocaleDateString("en-CA",{weekday:"long", month:"short", day:"numeric"}).toLowerCase();
     const b = document.createElement("button");
-    b.innerHTML = `<span>${esc(lbl)}</span><span class="muted">${rec ? `${rec.pts} / 700 · ${neg(rec.pts)}` : "not played"}</span>`;
+    b.innerHTML = `<span>${esc(lbl)}</span><span class="muted">play</span>`;
     b.onclick = ()=>{ closeSheet(); if(!run.live && !run.busy) startDive(ds); };
     box.append(b);
   }
@@ -486,15 +488,14 @@ function setScene(s){ document.body.dataset.scene = s; water = s === "water"; }
 function toHome(){
   closeSheet(); clearInterval(run.timer); run.live = false; run.pts = 0; camera(0);
   $("result").classList.remove("up"); $("play").hidden = true; $("end").hidden = true; setScene("home");
-  const rec = days[today()];
-  $("homeMeta").textContent = rec ? `today's best on this device: ${neg(rec.pts)}` : "seven prompts · about three minutes";
+  $("homeMeta").textContent = "seven prompts · about three minutes";
   window.scrollTo(0,0); $("goBtn").focus({preventScroll:true});
 }
 $("goBtn").onclick = ()=>startDive(today());
 
 async function startDive(ds){
   if(run.busy) return; run.busy = true;
-  run.day = ds; run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
+  run.day = ds || today(); run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
   $("end").hidden = true; $("result").classList.remove("up");
   document.querySelectorAll("#gauge .notch").forEach(n=>n.classList.remove("hit"));
   if(document.body.dataset.scene === "home" && !reduce){
@@ -572,7 +573,7 @@ async function accept(a, m){
 }
 function settle(a, m, why){
   const it = run.items[run.i];
-  it.a = a || ""; it.m = m; it.t = m ? m.entry.tier : null; it.q = m && m.how === "typo" ? m.entry.text : it.a;
+  it.a = m && m.how === "typo" ? m.entry.text : (a || ""); it.m = m; it.t = m ? m.entry.tier : null; it.q = it.a;
   if(m){ run.pts += TIERS[it.t].pts; camera(run.pts); }
   $("inp").disabled = true; $("dropBtn").disabled = true; $("skipBtn").disabled = true; $("ring").classList.remove("low");
   renderDots();
@@ -580,8 +581,7 @@ function settle(a, m, why){
   if(m){
     $("rTop").innerHTML = icon(t) + `<span class="tname"${t===5?' style="color:var(--aurora)"':""}>${TIERS[t].name}</span>`;
     $("rNums").textContent = `+${TIERS[t].pts} · sink ${metres(TIERS[t].pts)}`;
-    const same = M.tokens(a).join(" ") === M.tokens(m.entry.text).join(" ");
-    $("rSaid").textContent = `“${a}”` + (same || m.how==="lenient" ? "" : `, counted as “${m.entry.text}”`);
+    $("rSaid").textContent = m.how === "typo" ? `“${m.entry.text}”` : `“${a}”`;
     $("rFact").textContent = m.how === "lenient" ? "not on our list yet, so it lands in snowfall." : `${cap(TIERS[t].desc)} ${alsoHere(it.p, t, m.entry)}`.toLowerCase();
   } else {
     $("rTop").innerHTML = icon(null) + `<span class="tname">${why==="time" ? "time's up" : "skipped"}</span>`;
@@ -646,14 +646,10 @@ function finish(){
   $("eRating").innerHTML = pts === MAXPTS ? "you reached <b>the seafloor</b>." : `rating: <b>${esc(ratingFor(pts))}</b>`;
   $("eIcons").innerHTML = run.items.map(x=>icon(x.t)).join("");
   $("eRows").innerHTML = run.items.map(x=>`<div class="r"><span class="q">${esc(x.p.q)}</span><span class="a">${x.a ? esc(x.a) : '<span class="muted">no answer</span>'}</span><span class="t">${icon(x.t)}${x.t===null ? "+0" : `${esc(TIERS[x.t].name)} · +${TIERS[x.t].pts}`}</span></div>`).join("");
-  const prev = days[run.day]; if(!prev || pts > prev.pts){ days[run.day] = {pts}; store(KEY.days, days); }
-  scores.push(pts); if(scores.length > 1000) scores = scores.slice(-1000); store(KEY.scores, scores);
-  drawCurve(pts); nextDive(); wording = 0; renderQuotes();
+  drawCurve(pts); wording = 0; renderQuotes();
 }
 function drawCurve(pts){
-  const real = scores.length >= 8;
-  let mu = 260, sd = 95;
-  if(real){ mu = scores.reduce((a,b)=>a+b,0)/scores.length; sd = Math.max(30, Math.sqrt(scores.reduce((a,b)=>a+(b-mu)**2,0)/scores.length)); }
+  const mu = 260, sd = 95;
   const W = 320, B = 84, X = v => 10 + v/MAXPTS*(W-20), pdf = v => Math.exp(-((v-mu)**2)/(2*sd*sd));
   let d = `M${X(0)} ${B}`; for(let v=0; v<=MAXPTS; v+=10) d += ` L${X(v).toFixed(1)} ${(B - pdf(v)*(B-10)).toFixed(1)}`; d += ` L${X(MAXPTS)} ${B}Z`;
   const pct = Math.round(100*.5*(1+erf((pts-mu)/sd/Math.SQRT2)));
@@ -663,7 +659,7 @@ function drawCurve(pts){
     <text x="${Math.min(Math.max(X(pts),24),W-24)}" y="104" text-anchor="middle" font-size="13" font-weight="700" ${f}>you</text>
     <text x="10" y="104" font-size="12" ${f}>0</text><text x="${W-10}" y="104" text-anchor="end" font-size="12" ${f}>700</text>`;
   $("eCurve").setAttribute("aria-label", `score curve with your score of ${pts} marked`);
-  $("eCurveCap").textContent = real ? `deeper than about ${Math.min(99,Math.max(1,pct))}% of the ${scores.length} dives on this device.` : "a rough guess at where you rank. it gets real once more people play on this device.";
+  $("eCurveCap").textContent = `a rough guess: deeper than about ${Math.min(99,Math.max(1,pct))}% of divers.`;
 }
 function erf(x){ const s = Math.sign(x); x = Math.abs(x); const t = 1/(1+.3275911*x); return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x)); }
 function nextDive(){
@@ -706,6 +702,7 @@ function renderQuotes(){
 }
 $("reword").onclick = ()=>{ wording++; renderQuotes(); };
 $("again").onclick = toHome;
+$("playAgain").onclick = ()=>startDive(null);
 
 // ---------- station tools (settings → station tools, ctrl+shift+s, or #staff) ----------
 function tierSelect(sel){ return TIERS.map((t,i)=>`<option value="${i}"${i===sel?" selected":""}>${esc(t.name)} (${t.pts})</option>`).join(""); }
@@ -717,7 +714,7 @@ function showStaff(){
   <div style="display:grid;gap:8px"><h3>add an answer</h3><div class="fl"><select id="addPrompt" aria-label="prompt"></select><input type="text" id="addText" placeholder="answer, or several separated by |" aria-label="answer"><select id="addTier" aria-label="tier"></select><button class="btn sm" id="addBtn">add</button></div><span class="ok" id="addMsg" aria-live="polite"></span></div>
   <div style="display:grid;gap:8px"><h3>answers you added</h3><div class="tablewrap" id="custom"></div></div>
   <div style="display:grid;gap:8px"><h3>move to another device</h3><p class="muted">copy this text, paste it into station tools on the other device, then press import.</p><textarea id="xfer" aria-label="station data"></textarea>
-  <div class="fl"><button class="btn line sm" id="exportBtn">show my data</button><button class="btn line sm" id="importBtn">import</button><button class="btn line sm" id="clearScores">clear scores on this device</button><span class="ok" id="xferMsg" aria-live="polite"></span></div></div>`;
+  <div class="fl"><button class="btn line sm" id="exportBtn">show my data</button><button class="btn line sm" id="importBtn">import</button><span class="ok" id="xferMsg" aria-live="polite"></span></div></div>`;
   openSheet("station tools", box);
   $("lenT").onchange = e => { lenient = e.target.checked; store(KEY.lenient, lenient); };
   $("addPrompt").innerHTML = ALL.map(p=>`<option value="${p.id}">${esc(p.q)}</option>`).join("");
@@ -731,7 +728,6 @@ function showStaff(){
       store(KEY.custom, custom); ALL.forEach(p=>rebuild(p.id)); renderStaff(); $("xferMsg").textContent = "imported the added answers.";
     }catch(e){ $("xferMsg").textContent = "that text isn't valid station data."; }
   };
-  $("clearScores").onclick = e => { const b = e.target; if(b.dataset.sure){ scores = []; days = {}; store(KEY.scores, scores); store(KEY.days, days); b.textContent = "clear scores on this device"; delete b.dataset.sure; $("xferMsg").textContent = "scores cleared."; } else { b.dataset.sure = 1; b.textContent = "press again to clear"; } };
   renderStaff();
 }
 function renderStaff(){

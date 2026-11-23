@@ -766,7 +766,7 @@ mosaic|exam schedule|mosaic exam schedule|check mosaic|final exam schedule;
 study rooms|book a study room|library study rooms|group study rooms|thode study room|mills study room|library booking|room booking;
 exam review sessions|review sessions|review session|exam review|exam jams|exam jam|msu exam jam|review lecture;
 past exams|exam bank|past exam bank|old exams|mes exam bank|msu exam bank|society exam bank|mcmaster engineering society|mes|faculty society;
-msu|mcmaster students union|student union|msu services|msu clubs|clubs|student clubs;
+msu|mcmaster students union|student union|msu services|msu service;
 food collective centre|fcc|msu food collective centre|msu fcc|food bank|campus food bank|mac food bank|free food|food centre;
 mac bread bin|bread bin|free bread|msu bread bin;
 good2talk|good2talk helpline|good2talk line|ontario student helpline|helpline|crisis line;
@@ -779,7 +779,8 @@ residence life|res life|community advisor|ca|cas|my ca|residence advisor|ra|res 
 campus security|security|special constables|mcmaster security|student walk home attendant team|swhat|walk home|walk safe|safe walk|msu swhat;
 emergency first response team|efrt|msu efrt|first aid|campus first aid;
 campus health|health services|nurse|campus nurse|walk in clinic|campus walk in|doctor|physician|psychiatrist;
-pulse|the pulse|pulse fitness|mac rec|recreation|intramurals|drop in rec|fitness classes|yoga classes|dbac|david braley|ivor wynne|mac pool`,
+pulse|the pulse|pulse fitness|mac rec|recreation|intramurals|drop in rec|fitness classes|yoga classes|dbac|david braley|ivor wynne|mac pool;
+academic peer mentors|academic peer mentor|ssc peer mentors|ssc mentors|study mentor;undergrad peer tutoring network|peer tutoring network|tutorocean|tutor ocean;sas study space|sas study hall|sas study room|accessibility study space;wellness cafe|swc wellness cafe|exam productivity cafe|productivity cafe;exam snacks|swc exam snacks|free exam snacks|free snacks;rapid access counselling|rapid access counseling|same day counselling|same day counseling|walk in counselling|walk in counseling;writing and academic skills|writing and academic skills hub|academic skills hub|ssc hub;get help now|swc crisis support|crisis support|after hours support`,
 `wgen|women and gender equity network|msu wgen;
 pride community centre|msu pride|pride centre|pcc;
 maccess|msu maccess|disability peer support;
@@ -796,7 +797,7 @@ office of the registrar|registrar|registrars office|ssc front desk|gilmour hall;
 financial aid|student financial aid|scholarships|bursary|bursaries|emergency bursary|emergency funds|osap|student aid|awards office;
 career access professional and experiential learning|career services|career counselling|career counsellor|careers;
 mental health peer support|mental health workshops|wellness workshops|mindfulness sessions|swc workshops|swc groups|group therapy|wellness education;
-`,
+spiritual care and learning centre|sclc|spiritual care and learning|spiritual care centre;student case management|scm;housing and conference services|hcs|housing services|off campus housing|macrezlife|mac rez life|rez life events;financial wellness|financial wellness program|money coaching|budgeting help|budget help;first year experience|first year experience office|fye;international and exchange student experience|iese|exchange student office|international students office;access program|ssc access program;oscarplus|oscar plus|oscar;career counselling and job search|job search help|resume help|career centre;student mental health support|mental health support|mental health resources|mcmaster mental health strategy;engineering talkspot|talkspot|talk spot|engineering counsellor|engineering counselor|engineering wellness;macademics|macademics hub|msu macademics;health promotion|peer health educators|peer health education|swc health promotion|wellness peer educators;a student club|my club|club|clubs|* club|* * club|* * * club|* society|* * society|* association|* * association|* students association|* student association|* * students association|chem club|chemistry club|chemistry society|bio club|biology club|biology society|bio society|biochem society|psych society|psychology society|psych club|math society|math club|physics club|physics society|engineering society|commerce society|dcs|degroote commerce society|science society|mcmaster science society|mss|health sci society|health sciences society|hsss|bhsc society|kin society|kinesiology society|nursing society|arts and science society|arts sci society|social sciences society|humanities society|life sci society|life sciences society|compsci club|computer science club|cs club|coding club|deltahacks|pre med society|premed club|pre med club|pre law society|indian students association|chinese students association|korean students association|caribbean students association|african students association|filipino students association|vietnamese students association|pakistani students association|tamil students association|sikh students association|hindu students association|muslim students association|hillel|latin american students association|arab students association|iranian students association|black students association|study club|anime club|board games club|chess club|dance club|kpop club|choir|band|theatre club|drama club|film club|book club|knitting club|crochet club|art club|photography club|hiking club|outdoors club|climbing club|running club|yoga club|meditation club|mindfulness club|mental health club|jack org|active minds|debate club|model un|investment club|consulting club|robotics club|rocketry club|ultimate frisbee club|badminton club|volleyball club|basketball club|soccer club|cricket club|cooking club|baking club|gaming club|esports club|music club`,
 `the silhouette|silhouette|campus newspaper|cfmu|campus radio|93.3 cfmu;
 telus health student support|telus health|keep me safe|keep.me safe|kms app|mysupport|my ssp|student support program|24 7 counselling|online counselling|virtual counselling;
 988|suicide crisis helpline|call 988|text 988;
@@ -821,7 +822,8 @@ ron joyce centre|burlington campus;
 the exam hall|burridge gym|burridge|ivor wynne centre|iwc|exam centre|exam locations;
 campus events|destress events|de stress events|exam destress|destress week|wellness week|this event|this station|destress station|snowflake station|ornament station|free hot chocolate;
 the mac geese|geese;
-campus squirrels|squirrels|black squirrels`,
+campus squirrels|squirrels|black squirrels;
+chaplaincy exam hospitality|exam hospitality|chaplaincy lounge|chaplaincy drop in;fuel for finals;write night|writing night|write nights;10 days of wellness|ten days of wellness;exam stress relief yoga|exam yoga|pulse yoga|stress relief yoga;swc text reminders|exam wellness texts|wellness texts|swc texts;degroote academic advising table|exam support table|degroote advising|dsb advising;olas study sessions|olas|organization of latin american students;tim nolan testing centre|tim nolan|testing centre|sas testing;burnout workshop|burnout workshops;command your calendar|studying in university workshop|time management workshop;avtek|msu avtek;the grind|grind|msu grind;hotspot|msu hotspot;maroons|msu maroons|mac maroons;student market|union market|msu union market|msu student market;underground media and design|underground media design;campus events|msu campus events;first year council|fyc|msu first year council;msu child care centre|msu childcare;hamilton bike share|sobi|bike share|msu bike share;campus connect|campus connect bookings;student savings|student discounts|msu discounts;macgreen|msu macgreen;horizons|msu horizons;shinerama|msu shinerama`,
 `mcmaster indigenous health learning lodge|learning lodge|ihll|indigenous health learning lodge;
 macpherson institute|paul r macpherson institute|macpherson;
 lyons media lab|digital scholarship hub|sherman centre|sherman centre for digital scholarship|sherman centre for digital scholarship and research;
@@ -852,7 +854,8 @@ spiritual care dog|faith groups|campus ministry|muslim students association|msa|
 mcmaster sustainability|sustainability office|community garden|campus garden|mac farm|macgardens;
 the student walk home team at night|night walk home;
 mac pride month|pride events;
-the bus pass|presto|hsr pass|upass|u pass|bus pass`
+the bus pass|presto|hsr pass|upass|u pass|bus pass;
+riso|religious indigenous and spiritual observances|religious accommodation|religious accommodations|spiritual observance accommodation;maccard counter|replacement student card|maccard|student card|student id;virtual campus map|campus map|navigating exams video|exam room map;mend your mood|mend your mood group;food for thought|food for thought cooking sessions|swc cooking sessions|cooking sessions;the forge|forge|mcmaster forge;nature at mcmaster|nature at mac|mcmaster nature;model service|english language practice|conversation practice|english conversation;student assistance plan|sap|24 7 support line;david braley sport medicine|sport medicine|sport med clinic|physio|physiotherapy|campus physio;it support|campus it help|uts help desk;campus safety services|campus safety`
  ]},
 
 {id:"m6", drift:true, q:"Something that makes you smile on a hard day.", h:"Big or tiny.",
@@ -1780,7 +1783,8 @@ learning something new|learned a lot|growth|personal growth|growing|growing up|m
 being kind|being a good friend|helping others|helping my friends|helping a classmate|volunteering|volunteered|giving back|community service|charity|donating blood|blood donation|donated blood;
 reading|reading for fun|reading books|finished a book|read a book|books i read|reading more|my reading goal|goodreads|goodreads goal;
 staying positive|positivity|optimism|resilience|being resilient|bouncing back|not giving up|perseverance|grit|pushing through|keeping going|kept going|kept trying|trying|trying my best|my best|doing my best|effort|hard work|working hard|putting in the work;
-my relationship|my partner|relationships|my family|calling home|staying in touch|keeping in touch|reconnecting|my friendships|keeping friendships|long distance|making long distance work`,
+my relationship|my partner|relationships|my family|calling home|staying in touch|keeping in touch|reconnecting|my friendships|keeping friendships|long distance|making long distance work;
+learning new skills|new skills|new skill|learned new skills|learned a new skill|picked up a new skill|learned something new`,
 `welcome week|being a welcome week rep|welcome week rep|rep|being a rep|became a rep|frosh|spirit;
 efrt|joined efrt|msu efrt|first aid|first aid certification|cpr|cpr certified|lifeguard|lifeguarding|nl|national lifeguard;
 swhat|joined swhat|walk home team|msu swhat|walk safe;

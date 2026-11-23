@@ -37,11 +37,12 @@ for (let i = 0; i < 7; i++) {
   $("nextBtn").click();
 }
 await until(() => !$("end").hidden);
-console.log("\nEND:", $("eScore").textContent, $("eDepth").textContent, "|", $("eRating").textContent, "|", $("eCurveCap").textContent, "|", $("eNext").textContent);
+console.log("\nEND:", $("eScore").textContent, $("eDepth").textContent, "|", $("eRating").textContent, "|", $("eCurveCap").textContent);
 console.log("rows:", [...d.querySelectorAll("#eRows .r")].map(r => r.textContent).join(" // ").slice(0, 400));
 console.log("quotes:", [...d.querySelectorAll("#quotes textarea")].map(t => t.value).slice(0, 2));
 $("allBtn").click(); console.log("all answers:", $("sheetBody").textContent.slice(0, 160)); $("sheetX").click();
 $("menuBtn").click(); d.querySelector('[data-go="past"]').click(); console.log("past:", $("sheetBody").textContent.slice(0, 120)); $("sheetX").click();
 $("menuBtn").click(); d.querySelector('[data-go="settings"]').click(); $("staffOpen").click(); console.log("staff missed:", $("missed").textContent.slice(0, 160));
+const before = [...d.querySelectorAll("#eRows .q")].map(e=>e.textContent).join("|"); $("sheetX").click(); $("playAgain").click(); await until(() => !$("form").hidden && !$("inp").disabled); const after = w.eval("run.items.map(x=>x.p.q).join(\"|\")"); console.log("play again started:", $("prompt").textContent, "| new set:", before !== after, "| mcmaster 4th:", w.eval("run.items[3].p.id"), "| depth reset:", $("depth").textContent);
 console.log("errors:", errors.length ? errors : "none");
 process.exit(0);

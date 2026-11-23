@@ -277,8 +277,8 @@ body[data-scene="home"] #gauge{display:none}
       <div class="icons" id="eIcons"></div>
       <div class="curve"><svg id="eCurve" viewBox="0 0 320 110" role="img"></svg><p class="cap" id="eCurveCap"></p></div>
       <div class="rows" id="eRows"></div>
-      <div class="btnrow"><button class="btn" id="shareBtn">share</button><button class="btn line" id="allBtn">see all answers</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
-      <p class="next" id="eNext"></p>
+      <div class="btnrow"><button class="btn" id="playAgain">play again</button><button class="btn line" id="shareBtn">share</button><button class="btn line" id="allBtn">see all answers</button><span class="ok" id="shareMsg" aria-live="polite"></span></div>
+      
     </div>
     <div class="card frost">
       <h2 style="font-size:22px">turn it into a snowflake quote</h2>
@@ -375,15 +375,20 @@ body[data-scene="home"] #gauge{display:none}
   }
   const allow = n => n <= 4 ? 0 : n <= 7 ? 1 : n <= 13 ? 2 : 3;
   const tokEq = (a, b) => a === b || (Math.min(a.length, b.length) >= 6 && a[0] === b[0] && osa(a, b, 1) <= 1);
+  // single words too generic to count when they appear inside a longer answer
+  const WEAK = new Set("new you not pass tell make good time day list feel out up more best life eat see say use work school class exam study mac msu student campus servic center help support resourc place thing one get lot".split(" "));
   const NEG = new Set(["no", "not", "dont", "never", "without", "cant", "wont", "stop", "avoid"]);
 
   // entries: [{text, aliases:[...], tier}]
   function buildIndex(entries) {
-    const exact = new Map(), sorted = new Map(), flat = new Map(), list = [];
+    const exact = new Map(), sorted = new Map(), flat = new Map(), list = [], wild = [];
     for (const e of entries) {
       for (const al of [e.text, ...(e.aliases || [])]) {
+        // "* club" = any one word, then club
+        if (al.includes("*")) { const wt = tokens(al.replace(/\*/g, "zzwild")).map(t => t === "zzwild" ? "*" : t); if (wt.length) wild.push({ e, tk: wt }); continue; }
         const tk = tokens(al); if (!tk.length) continue;
-        const rec = { e, tk, flat: tk.join(""), raw: tokens(al, true).join("") };
+        const words = clean(al).split(" ").length;
+        const rec = { e, tk, flat: tk.join(""), raw: tokens(al, true).join(""), loose: !(tk.length === 1 && (words >= 3 || WEAK.has(tk[0]))) };
         const k = tk.join(" "), ks = tk.slice().sort().join(" ");
         if (!exact.has(k)) exact.set(k, rec);
         if (!sorted.has(ks)) sorted.set(ks, rec);
@@ -391,7 +396,7 @@ body[data-scene="home"] #gauge{display:none}
         list.push(rec);
       }
     }
-    return { exact, sorted, flat, list };
+    return { exact, sorted, flat, list, wild };
   }
   // returns {entry, how: "exact"|"typo"|"contains"} or null
   function find(index, input) {
@@ -399,6 +404,7 @@ body[data-scene="home"] #gauge{display:none}
     const k = tk.join(" "), f = tk.join(""), fr = tokens(input, true).join("");
     let r = index.exact.get(k) || index.sorted.get(tk.slice().sort().join(" ")) || index.flat.get(f);
     if (r) return { entry: r.e, how: "exact" };
+    for (const w of index.wild || []) if (w.tk.length === tk.length && w.tk.every((x, i) => x === "*" || tokEq(tk[i], x))) return { entry: w.e, how: "wild" };
     // whole-answer typo
     const max = allow(f.length);
     if (max > 0) {
@@ -420,7 +426,7 @@ body[data-scene="home"] #gauge{display:none}
     const neg = tk.some(t => NEG.has(t));
     let best = null;
     for (const rec of index.list) {
-      if (rec.tk.length > tk.length || tk.length - rec.tk.length > 3) continue;
+      if (!rec.loose || rec.tk.length > tk.length || tk.length - rec.tk.length > 3) continue;
       if (rec.tk.length === 1 && rec.tk[0].length < 3) continue;
       if (neg && !rec.tk.some(t => NEG.has(t))) continue;
       let i = 0;
@@ -1217,7 +1223,7 @@ mosaic|exam schedule|mosaic exam schedule|check mosaic|final exam schedule;
 study rooms|book a study room|library study rooms|group study rooms|thode study room|mills study room|library booking|room booking;
 exam review sessions|review sessions|review session|exam review|exam jams|exam jam|msu exam jam|review lecture;
 past exams|exam bank|past exam bank|old exams|mes exam bank|msu exam bank|society exam bank|mcmaster engineering society|mes|faculty society;
-msu|mcmaster students union|student union|msu services|msu clubs|clubs|student clubs;
+msu|mcmaster students union|student union|msu services|msu service;
 food collective centre|fcc|msu food collective centre|msu fcc|food bank|campus food bank|mac food bank|free food|food centre;
 mac bread bin|bread bin|free bread|msu bread bin;
 good2talk|good2talk helpline|good2talk line|ontario student helpline|helpline|crisis line;
@@ -1230,7 +1236,8 @@ residence life|res life|community advisor|ca|cas|my ca|residence advisor|ra|res 
 campus security|security|special constables|mcmaster security|student walk home attendant team|swhat|walk home|walk safe|safe walk|msu swhat;
 emergency first response team|efrt|msu efrt|first aid|campus first aid;
 campus health|health services|nurse|campus nurse|walk in clinic|campus walk in|doctor|physician|psychiatrist;
-pulse|the pulse|pulse fitness|mac rec|recreation|intramurals|drop in rec|fitness classes|yoga classes|dbac|david braley|ivor wynne|mac pool`,
+pulse|the pulse|pulse fitness|mac rec|recreation|intramurals|drop in rec|fitness classes|yoga classes|dbac|david braley|ivor wynne|mac pool;
+academic peer mentors|academic peer mentor|ssc peer mentors|ssc mentors|study mentor;undergrad peer tutoring network|peer tutoring network|tutorocean|tutor ocean;sas study space|sas study hall|sas study room|accessibility study space;wellness cafe|swc wellness cafe|exam productivity cafe|productivity cafe;exam snacks|swc exam snacks|free exam snacks|free snacks;rapid access counselling|rapid access counseling|same day counselling|same day counseling|walk in counselling|walk in counseling;writing and academic skills|writing and academic skills hub|academic skills hub|ssc hub;get help now|swc crisis support|crisis support|after hours support`,
 `wgen|women and gender equity network|msu wgen;
 pride community centre|msu pride|pride centre|pcc;
 maccess|msu maccess|disability peer support;
@@ -1247,7 +1254,7 @@ office of the registrar|registrar|registrars office|ssc front desk|gilmour hall;
 financial aid|student financial aid|scholarships|bursary|bursaries|emergency bursary|emergency funds|osap|student aid|awards office;
 career access professional and experiential learning|career services|career counselling|career counsellor|careers;
 mental health peer support|mental health workshops|wellness workshops|mindfulness sessions|swc workshops|swc groups|group therapy|wellness education;
-`,
+spiritual care and learning centre|sclc|spiritual care and learning|spiritual care centre;student case management|scm;housing and conference services|hcs|housing services|off campus housing|macrezlife|mac rez life|rez life events;financial wellness|financial wellness program|money coaching|budgeting help|budget help;first year experience|first year experience office|fye;international and exchange student experience|iese|exchange student office|international students office;access program|ssc access program;oscarplus|oscar plus|oscar;career counselling and job search|job search help|resume help|career centre;student mental health support|mental health support|mental health resources|mcmaster mental health strategy;engineering talkspot|talkspot|talk spot|engineering counsellor|engineering counselor|engineering wellness;macademics|macademics hub|msu macademics;health promotion|peer health educators|peer health education|swc health promotion|wellness peer educators;a student club|my club|club|clubs|* club|* * club|* * * club|* society|* * society|* association|* * association|* students association|* student association|* * students association|chem club|chemistry club|chemistry society|bio club|biology club|biology society|bio society|biochem society|psych society|psychology society|psych club|math society|math club|physics club|physics society|engineering society|commerce society|dcs|degroote commerce society|science society|mcmaster science society|mss|health sci society|health sciences society|hsss|bhsc society|kin society|kinesiology society|nursing society|arts and science society|arts sci society|social sciences society|humanities society|life sci society|life sciences society|compsci club|computer science club|cs club|coding club|deltahacks|pre med society|premed club|pre med club|pre law society|indian students association|chinese students association|korean students association|caribbean students association|african students association|filipino students association|vietnamese students association|pakistani students association|tamil students association|sikh students association|hindu students association|muslim students association|hillel|latin american students association|arab students association|iranian students association|black students association|study club|anime club|board games club|chess club|dance club|kpop club|choir|band|theatre club|drama club|film club|book club|knitting club|crochet club|art club|photography club|hiking club|outdoors club|climbing club|running club|yoga club|meditation club|mindfulness club|mental health club|jack org|active minds|debate club|model un|investment club|consulting club|robotics club|rocketry club|ultimate frisbee club|badminton club|volleyball club|basketball club|soccer club|cricket club|cooking club|baking club|gaming club|esports club|music club`,
 `the silhouette|silhouette|campus newspaper|cfmu|campus radio|93.3 cfmu;
 telus health student support|telus health|keep me safe|keep.me safe|kms app|mysupport|my ssp|student support program|24 7 counselling|online counselling|virtual counselling;
 988|suicide crisis helpline|call 988|text 988;
@@ -1272,7 +1279,8 @@ ron joyce centre|burlington campus;
 the exam hall|burridge gym|burridge|ivor wynne centre|iwc|exam centre|exam locations;
 campus events|destress events|de stress events|exam destress|destress week|wellness week|this event|this station|destress station|snowflake station|ornament station|free hot chocolate;
 the mac geese|geese;
-campus squirrels|squirrels|black squirrels`,
+campus squirrels|squirrels|black squirrels;
+chaplaincy exam hospitality|exam hospitality|chaplaincy lounge|chaplaincy drop in;fuel for finals;write night|writing night|write nights;10 days of wellness|ten days of wellness;exam stress relief yoga|exam yoga|pulse yoga|stress relief yoga;swc text reminders|exam wellness texts|wellness texts|swc texts;degroote academic advising table|exam support table|degroote advising|dsb advising;olas study sessions|olas|organization of latin american students;tim nolan testing centre|tim nolan|testing centre|sas testing;burnout workshop|burnout workshops;command your calendar|studying in university workshop|time management workshop;avtek|msu avtek;the grind|grind|msu grind;hotspot|msu hotspot;maroons|msu maroons|mac maroons;student market|union market|msu union market|msu student market;underground media and design|underground media design;campus events|msu campus events;first year council|fyc|msu first year council;msu child care centre|msu childcare;hamilton bike share|sobi|bike share|msu bike share;campus connect|campus connect bookings;student savings|student discounts|msu discounts;macgreen|msu macgreen;horizons|msu horizons;shinerama|msu shinerama`,
 `mcmaster indigenous health learning lodge|learning lodge|ihll|indigenous health learning lodge;
 macpherson institute|paul r macpherson institute|macpherson;
 lyons media lab|digital scholarship hub|sherman centre|sherman centre for digital scholarship|sherman centre for digital scholarship and research;
@@ -1303,7 +1311,8 @@ spiritual care dog|faith groups|campus ministry|muslim students association|msa|
 mcmaster sustainability|sustainability office|community garden|campus garden|mac farm|macgardens;
 the student walk home team at night|night walk home;
 mac pride month|pride events;
-the bus pass|presto|hsr pass|upass|u pass|bus pass`
+the bus pass|presto|hsr pass|upass|u pass|bus pass;
+riso|religious indigenous and spiritual observances|religious accommodation|religious accommodations|spiritual observance accommodation;maccard counter|replacement student card|maccard|student card|student id;virtual campus map|campus map|navigating exams video|exam room map;mend your mood|mend your mood group;food for thought|food for thought cooking sessions|swc cooking sessions|cooking sessions;the forge|forge|mcmaster forge;nature at mcmaster|nature at mac|mcmaster nature;model service|english language practice|conversation practice|english conversation;student assistance plan|sap|24 7 support line;david braley sport medicine|sport medicine|sport med clinic|physio|physiotherapy|campus physio;it support|campus it help|uts help desk;campus safety services|campus safety`
  ]},
 
 {id:"m6", drift:true, q:"Something that makes you smile on a hard day.", h:"Big or tiny.",
@@ -2231,7 +2240,8 @@ learning something new|learned a lot|growth|personal growth|growing|growing up|m
 being kind|being a good friend|helping others|helping my friends|helping a classmate|volunteering|volunteered|giving back|community service|charity|donating blood|blood donation|donated blood;
 reading|reading for fun|reading books|finished a book|read a book|books i read|reading more|my reading goal|goodreads|goodreads goal;
 staying positive|positivity|optimism|resilience|being resilient|bouncing back|not giving up|perseverance|grit|pushing through|keeping going|kept going|kept trying|trying|trying my best|my best|doing my best|effort|hard work|working hard|putting in the work;
-my relationship|my partner|relationships|my family|calling home|staying in touch|keeping in touch|reconnecting|my friendships|keeping friendships|long distance|making long distance work`,
+my relationship|my partner|relationships|my family|calling home|staying in touch|keeping in touch|reconnecting|my friendships|keeping friendships|long distance|making long distance work;
+learning new skills|new skills|new skill|learned new skills|learned a new skill|picked up a new skill|learned something new`,
 `welcome week|being a welcome week rep|welcome week rep|rep|being a rep|became a rep|frosh|spirit;
 efrt|joined efrt|msu efrt|first aid|first aid certification|cpr|cpr certified|lifeguard|lifeguarding|nl|national lifeguard;
 swhat|joined swhat|walk home team|msu swhat|walk safe;
@@ -2807,7 +2817,7 @@ const LANDMARKS = [
 const KEY = {days:"snowdrift.days.v1", scores:"snowdrift.scores.v1", custom:"snowdrift.custom.v1", missed:"snowdrift.missed.v1", lenient:"snowdrift.lenient.v1", sound:"snowdrift.sound.v1"};
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function store(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-let days = load(KEY.days, {}), scores = load(KEY.scores, []), custom = load(KEY.custom, {}), missed = load(KEY.missed, {});
+let custom = load(KEY.custom, {}), missed = load(KEY.missed, {});
 let lenient = !!load(KEY.lenient, false), sound = !!load(KEY.sound, false);
 
 // ---------- answer lists ----------
@@ -2826,7 +2836,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 function metres(pts){ return (pts*10).toLocaleString("en-CA") + " m"; }
-function neg(pts){ return pts ? "−" + metres(pts) : "0 m"; }
+function neg(pts){ return metres(pts); }
 function icon(t){ return t===null || t===undefined ? `<svg class="ic miss" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><title>no answer</title>${MISS}</svg>`
   : `<svg class="ic${t===5?" star":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><title>${TIERS[t].name}</title>${ICON[t]}</svg>`; }
 function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
@@ -2834,8 +2844,10 @@ function today(){ return dstr(new Date()); }
 function hash(s){ let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h>>>0; }
 function rng(seed){ return ()=>{ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1 | seed); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
 function shuffled(a, r=Math.random){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(r()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
-// each day has its own 7 prompts, the same on every device; the mcmaster exam-season prompt is always 4th
-function dayPrompts(ds){ const r = rng(hash("snowdrift"+ds)); const rest = shuffled(ALL.filter(p=>p.id!=="c1"), r).slice(0,6); rest.splice(3,0,BYID.c1); return rest; }
+// 7 prompts per dive; the mcmaster services prompt is always 4th.
+// a day's first dive uses that day's set (the same on every device); "play again" deals a fresh random set.
+function promptSet(r){ const rest = shuffled(ALL.filter(p=>p.id!=="c1"), r).slice(0,6); rest.splice(3,0,BYID.c1); return rest; }
+function dayPrompts(ds){ return ds ? promptSet(rng(hash("snowdrift"+ds))) : promptSet(Math.random); }
 // rating: the tier whose points match the average answer
 function ratingFor(pts){ if(!pts) return "still on the surface"; const avg = pts/7; let k = 0; TIERS.forEach((t,i)=>{ if(avg >= t.pts) k = i; }); return TIERS[k].name; }
 
@@ -2931,7 +2943,7 @@ addEventListener("keydown", e => { if(e.key === "Escape"){ if(!$("sheet").hidden
 
 function tierTable(){ return `<div class="tiers">${TIERS.map((t,i)=>`<div class="tr">${icon(i)}<span><b>${t.name}</b><small>${t.desc}</small></span><span class="pts">${t.pts} pts<small>sink ${metres(t.pts)}</small></span></div>`).join("")}</div>`; }
 function showHow(){
-  openSheet("how to play", `<p>seven prompts a day, the same for everyone. after a 3, 2, 1, you have 25 seconds to type one answer.</p>
+  openSheet("how to play", `<p>seven prompts per dive. after a 3, 2, 1, you have 25 seconds to type one answer.</p>
   <p>the rarer your answer, the deeper it sinks. typos and different wording are fine, and mcmaster spots and services count. if an answer isn't on our list, try saying it another way.</p>
   ${tierTable()}
   <p class="muted">1 point = 10 m. a perfect 700 reaches the seafloor at 7,000 m.</p>`);
@@ -2939,10 +2951,10 @@ function showHow(){
 function showPast(){
   const box = document.createElement("div"); box.className = "days";
   for(let k=0;k<7;k++){
-    const d = new Date(); d.setDate(d.getDate()-k); const ds = dstr(d), rec = days[ds];
+    const d = new Date(); d.setDate(d.getDate()-k); const ds = dstr(d);
     const lbl = k===0 ? "today" : k===1 ? "yesterday" : d.toLocaleDateString("en-CA",{weekday:"long", month:"short", day:"numeric"}).toLowerCase();
     const b = document.createElement("button");
-    b.innerHTML = `<span>${esc(lbl)}</span><span class="muted">${rec ? `${rec.pts} / 700 · ${neg(rec.pts)}` : "not played"}</span>`;
+    b.innerHTML = `<span>${esc(lbl)}</span><span class="muted">play</span>`;
     b.onclick = ()=>{ closeSheet(); if(!run.live && !run.busy) startDive(ds); };
     box.append(b);
   }
@@ -2963,15 +2975,14 @@ function setScene(s){ document.body.dataset.scene = s; water = s === "water"; }
 function toHome(){
   closeSheet(); clearInterval(run.timer); run.live = false; run.pts = 0; camera(0);
   $("result").classList.remove("up"); $("play").hidden = true; $("end").hidden = true; setScene("home");
-  const rec = days[today()];
-  $("homeMeta").textContent = rec ? `today's best on this device: ${neg(rec.pts)}` : "seven prompts · about three minutes";
+  $("homeMeta").textContent = "seven prompts · about three minutes";
   window.scrollTo(0,0); $("goBtn").focus({preventScroll:true});
 }
 $("goBtn").onclick = ()=>startDive(today());
 
 async function startDive(ds){
   if(run.busy) return; run.busy = true;
-  run.day = ds; run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
+  run.day = ds || today(); run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
   $("end").hidden = true; $("result").classList.remove("up");
   document.querySelectorAll("#gauge .notch").forEach(n=>n.classList.remove("hit"));
   if(document.body.dataset.scene === "home" && !reduce){
@@ -3049,7 +3060,7 @@ async function accept(a, m){
 }
 function settle(a, m, why){
   const it = run.items[run.i];
-  it.a = a || ""; it.m = m; it.t = m ? m.entry.tier : null; it.q = m && m.how === "typo" ? m.entry.text : it.a;
+  it.a = m && m.how === "typo" ? m.entry.text : (a || ""); it.m = m; it.t = m ? m.entry.tier : null; it.q = it.a;
   if(m){ run.pts += TIERS[it.t].pts; camera(run.pts); }
   $("inp").disabled = true; $("dropBtn").disabled = true; $("skipBtn").disabled = true; $("ring").classList.remove("low");
   renderDots();
@@ -3057,8 +3068,7 @@ function settle(a, m, why){
   if(m){
     $("rTop").innerHTML = icon(t) + `<span class="tname"${t===5?' style="color:var(--aurora)"':""}>${TIERS[t].name}</span>`;
     $("rNums").textContent = `+${TIERS[t].pts} · sink ${metres(TIERS[t].pts)}`;
-    const same = M.tokens(a).join(" ") === M.tokens(m.entry.text).join(" ");
-    $("rSaid").textContent = `“${a}”` + (same || m.how==="lenient" ? "" : `, counted as “${m.entry.text}”`);
+    $("rSaid").textContent = m.how === "typo" ? `“${m.entry.text}”` : `“${a}”`;
     $("rFact").textContent = m.how === "lenient" ? "not on our list yet, so it lands in snowfall." : `${cap(TIERS[t].desc)} ${alsoHere(it.p, t, m.entry)}`.toLowerCase();
   } else {
     $("rTop").innerHTML = icon(null) + `<span class="tname">${why==="time" ? "time's up" : "skipped"}</span>`;
@@ -3123,14 +3133,10 @@ function finish(){
   $("eRating").innerHTML = pts === MAXPTS ? "you reached <b>the seafloor</b>." : `rating: <b>${esc(ratingFor(pts))}</b>`;
   $("eIcons").innerHTML = run.items.map(x=>icon(x.t)).join("");
   $("eRows").innerHTML = run.items.map(x=>`<div class="r"><span class="q">${esc(x.p.q)}</span><span class="a">${x.a ? esc(x.a) : '<span class="muted">no answer</span>'}</span><span class="t">${icon(x.t)}${x.t===null ? "+0" : `${esc(TIERS[x.t].name)} · +${TIERS[x.t].pts}`}</span></div>`).join("");
-  const prev = days[run.day]; if(!prev || pts > prev.pts){ days[run.day] = {pts}; store(KEY.days, days); }
-  scores.push(pts); if(scores.length > 1000) scores = scores.slice(-1000); store(KEY.scores, scores);
-  drawCurve(pts); nextDive(); wording = 0; renderQuotes();
+  drawCurve(pts); wording = 0; renderQuotes();
 }
 function drawCurve(pts){
-  const real = scores.length >= 8;
-  let mu = 260, sd = 95;
-  if(real){ mu = scores.reduce((a,b)=>a+b,0)/scores.length; sd = Math.max(30, Math.sqrt(scores.reduce((a,b)=>a+(b-mu)**2,0)/scores.length)); }
+  const mu = 260, sd = 95;
   const W = 320, B = 84, X = v => 10 + v/MAXPTS*(W-20), pdf = v => Math.exp(-((v-mu)**2)/(2*sd*sd));
   let d = `M${X(0)} ${B}`; for(let v=0; v<=MAXPTS; v+=10) d += ` L${X(v).toFixed(1)} ${(B - pdf(v)*(B-10)).toFixed(1)}`; d += ` L${X(MAXPTS)} ${B}Z`;
   const pct = Math.round(100*.5*(1+erf((pts-mu)/sd/Math.SQRT2)));
@@ -3140,7 +3146,7 @@ function drawCurve(pts){
     <text x="${Math.min(Math.max(X(pts),24),W-24)}" y="104" text-anchor="middle" font-size="13" font-weight="700" ${f}>you</text>
     <text x="10" y="104" font-size="12" ${f}>0</text><text x="${W-10}" y="104" text-anchor="end" font-size="12" ${f}>700</text>`;
   $("eCurve").setAttribute("aria-label", `score curve with your score of ${pts} marked`);
-  $("eCurveCap").textContent = real ? `deeper than about ${Math.min(99,Math.max(1,pct))}% of the ${scores.length} dives on this device.` : "a rough guess at where you rank. it gets real once more people play on this device.";
+  $("eCurveCap").textContent = `a rough guess: deeper than about ${Math.min(99,Math.max(1,pct))}% of divers.`;
 }
 function erf(x){ const s = Math.sign(x); x = Math.abs(x); const t = 1/(1+.3275911*x); return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x)); }
 function nextDive(){
@@ -3183,6 +3189,7 @@ function renderQuotes(){
 }
 $("reword").onclick = ()=>{ wording++; renderQuotes(); };
 $("again").onclick = toHome;
+$("playAgain").onclick = ()=>startDive(null);
 
 // ---------- station tools (settings → station tools, ctrl+shift+s, or #staff) ----------
 function tierSelect(sel){ return TIERS.map((t,i)=>`<option value="${i}"${i===sel?" selected":""}>${esc(t.name)} (${t.pts})</option>`).join(""); }
@@ -3194,7 +3201,7 @@ function showStaff(){
   <div style="display:grid;gap:8px"><h3>add an answer</h3><div class="fl"><select id="addPrompt" aria-label="prompt"></select><input type="text" id="addText" placeholder="answer, or several separated by |" aria-label="answer"><select id="addTier" aria-label="tier"></select><button class="btn sm" id="addBtn">add</button></div><span class="ok" id="addMsg" aria-live="polite"></span></div>
   <div style="display:grid;gap:8px"><h3>answers you added</h3><div class="tablewrap" id="custom"></div></div>
   <div style="display:grid;gap:8px"><h3>move to another device</h3><p class="muted">copy this text, paste it into station tools on the other device, then press import.</p><textarea id="xfer" aria-label="station data"></textarea>
-  <div class="fl"><button class="btn line sm" id="exportBtn">show my data</button><button class="btn line sm" id="importBtn">import</button><button class="btn line sm" id="clearScores">clear scores on this device</button><span class="ok" id="xferMsg" aria-live="polite"></span></div></div>`;
+  <div class="fl"><button class="btn line sm" id="exportBtn">show my data</button><button class="btn line sm" id="importBtn">import</button><span class="ok" id="xferMsg" aria-live="polite"></span></div></div>`;
   openSheet("station tools", box);
   $("lenT").onchange = e => { lenient = e.target.checked; store(KEY.lenient, lenient); };
   $("addPrompt").innerHTML = ALL.map(p=>`<option value="${p.id}">${esc(p.q)}</option>`).join("");
@@ -3208,7 +3215,6 @@ function showStaff(){
       store(KEY.custom, custom); ALL.forEach(p=>rebuild(p.id)); renderStaff(); $("xferMsg").textContent = "imported the added answers.";
     }catch(e){ $("xferMsg").textContent = "that text isn't valid station data."; }
   };
-  $("clearScores").onclick = e => { const b = e.target; if(b.dataset.sure){ scores = []; days = {}; store(KEY.scores, scores); store(KEY.days, days); b.textContent = "clear scores on this device"; delete b.dataset.sure; $("xferMsg").textContent = "scores cleared."; } else { b.dataset.sure = 1; b.textContent = "press again to clear"; } };
   renderStaff();
 }
 function renderStaff(){

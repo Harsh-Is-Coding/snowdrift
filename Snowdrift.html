@@ -74,6 +74,22 @@ p{margin:0}
 #home .base .meta{font-size:15px;color:var(--navy);font-weight:600}
 body[data-scene="water"] #home{display:none}
 body[data-scene="home"] #app{display:none}
+/* the gauge is only needed while diving */
+body[data-view="end"] #gauge{display:none}
+body[data-view="end"] #app{padding-right:16px}
+/* phones: landmark labels would sit on top of the controls */
+@media (max-width:699px){
+  .mark .lbl{display:none}
+  .mark svg{fill-opacity:.07}
+  .card{padding:20px 18px}
+  .answer{grid-template-columns:minmax(0,1fr) 54px;gap:10px}
+  .ring,.ring svg{width:54px;height:54px}
+  .answer input{font-size:17px;padding:13px 16px}
+  .dots{gap:7px}
+  .depth{font-size:18px}
+  #result .tname{font-size:24px}
+  #home .base{gap:10px}
+}
 
 /* breaking the ice */
 #breaker{position:fixed;inset:0;z-index:50;background:var(--glacier);color:var(--navy);display:grid;place-items:center;pointer-events:none;opacity:0}
@@ -178,14 +194,15 @@ body[data-scene="home"] #gauge{display:none}
 .rows .r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--frost-line)}
 .rows .q{font-size:14px;opacity:.85;grid-column:1 / -1}
 .rows .a{font-weight:700;overflow-wrap:anywhere}
-.rows .t{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+.rows .t{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+@media (max-width:699px){.rows .r{grid-template-columns:minmax(0,1fr)}.rows .t{justify-content:flex-start}}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .next{font-size:15px;opacity:.85}
 .ok{font-size:15px;color:var(--aurora);overflow-wrap:anywhere}
 .quotes{display:grid;gap:14px}
 .quote{display:grid;gap:6px}
 .quote label{font-size:14px;opacity:.85}
-.quote textarea{width:100%;min-height:64px;resize:vertical;font-size:18px;font-weight:600;padding:12px 14px;border-radius:12px;border:2px dashed var(--glacier);background:rgba(191,227,242,.1);color:var(--snow)}
+.quote textarea{width:100%;min-height:84px;field-sizing:content;resize:vertical;font-size:18px;font-weight:600;padding:12px 14px;border-radius:12px;border:2px dashed var(--glacier);background:rgba(191,227,242,.1);color:var(--snow)}
 .quote .row{display:flex;justify-content:flex-end;gap:10px;align-items:center}
 
 /* sheets: how to play, past days, all answers, settings, station tools */
@@ -2973,7 +2990,7 @@ function showSettings(){
 // ---------- game ----------
 function setScene(s){ document.body.dataset.scene = s; water = s === "water"; }
 function toHome(){
-  closeSheet(); clearInterval(run.timer); run.live = false; run.pts = 0; camera(0);
+  document.body.dataset.view = ""; closeSheet(); clearInterval(run.timer); run.live = false; run.pts = 0; camera(0);
   $("result").classList.remove("up"); $("play").hidden = true; $("end").hidden = true; setScene("home");
   $("homeMeta").textContent = "seven prompts · about three minutes";
   window.scrollTo(0,0); $("goBtn").focus({preventScroll:true});
@@ -2983,7 +3000,7 @@ $("goBtn").onclick = ()=>startDive(today());
 async function startDive(ds){
   if(run.busy) return; run.busy = true;
   run.day = ds || today(); run.items = dayPrompts(ds).map(p=>({p})); run.i = 0; run.pts = 0;
-  $("end").hidden = true; $("result").classList.remove("up");
+  $("end").hidden = true; $("result").classList.remove("up"); document.body.dataset.view = "";
   document.querySelectorAll("#gauge .notch").forEach(n=>n.classList.remove("hit"));
   if(document.body.dataset.scene === "home" && !reduce){
     const br = $("breaker");
@@ -3100,7 +3117,8 @@ async function sink(word, t){
   const g = $("gauge").getBoundingClientRect(), end = notchPoint(t);
   const at = (x, y, s) => `translate(${x - w/2}px,${y - h/2}px) scale(${s})`;
   const sx = input.left + Math.min(input.width/2, w/2 + 20), sy = input.top + input.height/2;
-  const ix = g.right - 13 - 30, iy = g.top - 8;
+  const fit = x => Math.min(x, innerWidth - w*.62/2 - 8);
+  const ix = fit(g.right - 13 - 30), iy = g.top - 8;
   // 1. the word shrinks into a glowing crystal and rises to the ice line
   await el.animate([{transform:at(sx,sy,1)}, {transform:at(ix,iy,.55)}], {duration:420, easing:"cubic-bezier(.4,0,.2,1)", fill:"forwards"}).finished;
   // 2. it cracks through
@@ -3108,7 +3126,7 @@ async function sink(word, t){
   await wait(200);
   // 3. it drifts down past the notches, slowing as it nears its tier, glowing brighter the deeper it goes
   el.style.boxShadow = `0 0 ${glow*1.7}px rgba(${col},${.45 + t*.1})`;
-  const ex = end.x - 30, dur = 520 + t*200;
+  const ex = fit(end.x - 30), dur = 520 + t*200;
   const drift = el.animate([{transform:at(ix,iy,.55)}, {transform:at(ex,end.y,.6)}], {duration:dur, easing:"cubic-bezier(.25,.6,.3,1)", fill:"forwards"});
   const bub = setInterval(()=>{ const r = el.getBoundingClientRect(); bubble(r.left + r.width/2, r.top); if(Math.random()<.35) bubbleSound(); }, 110);
   await drift.finished; clearInterval(bub);
@@ -3126,7 +3144,7 @@ function aurora(){ const a = $("aurora"); a.classList.remove("on"); void a.offse
 // ---------- end ----------
 let wording = 0, nextTimer = null;
 function finish(){
-  $("play").hidden = true; $("end").hidden = false; window.scrollTo(0,0);
+  document.body.dataset.view = "end"; $("play").hidden = true; $("end").hidden = false; window.scrollTo(0,0);
   const pts = run.pts;
   $("eScore").textContent = `${pts} / 700`;
   $("eDepth").textContent = neg(pts);
